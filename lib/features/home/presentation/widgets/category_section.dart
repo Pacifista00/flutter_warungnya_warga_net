@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:flutter_warungnya_warga_net/features/home/data/datasources/category_remote_datasource.dart';
 import 'package:flutter_warungnya_warga_net/features/home/data/models/category_model.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/section_title.dart';
-import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 
 class CategorySection extends StatefulWidget {
   const CategorySection({super.key});

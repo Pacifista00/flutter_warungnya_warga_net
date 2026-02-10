@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_warungnya_warga_net/constant/app_spacing.dart';
+import 'package:flutter_warungnya_warga_net/core/constant/app_spacing.dart';
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 
 class SectionTitle extends StatelessWidget {

@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_warungnya_warga_net/core/network/dio_client.dart';
-
-import '../models/category_model.dart';
+import 'package:flutter_warungnya_warga_net/features/home/data/models/category_model.dart';
 
 class CategoryRemoteDatasource {
   final Dio dio = DioClient.create();

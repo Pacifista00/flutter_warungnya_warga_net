@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 
 class BottomNav extends StatelessWidget {
   final int currentIndex;

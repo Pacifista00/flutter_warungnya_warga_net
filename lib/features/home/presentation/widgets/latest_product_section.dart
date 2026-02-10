@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_warungnya_warga_net/features/home/data/datasources/product_remote_datasource.dart';
 import 'package:flutter_warungnya_warga_net/features/home/data/models/product_model.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/product_card.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/section_title.dart';
-import 'package:go_router/go_router.dart';
 
 class LatestProductSection extends StatefulWidget {
   const LatestProductSection({super.key});

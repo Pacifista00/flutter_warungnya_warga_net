@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import '../../../../core/network/dio_client.dart';
-import '../models/product_model.dart';
+import 'package:flutter_warungnya_warga_net/core/network/dio.dart';
+import 'package:flutter_warungnya_warga_net/features/home/data/models/product_model.dart';
 
 class ProductRemoteDatasource {
   final Dio dio = DioClient.create();

@@ -32,7 +32,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/register', builder: (_, __) => const RegisterPage()),
       GoRoute(
         path: '/verify-email',
-        builder: (_, __) => const VerifyEmailPage(),
+        builder: (context, state) {
+          final email = state.extra as String;
+          return VerifyEmailPage(email: email);
+        },
       ),
 
       // PROTECTED (LOGIN REQUIRED)

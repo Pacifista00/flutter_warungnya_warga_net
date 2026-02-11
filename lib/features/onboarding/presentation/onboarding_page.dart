@@ -184,7 +184,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size(0, 52),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(50),
                           ),
                         ),
                         child: const Text('Kembali'),
@@ -200,7 +200,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(50),
                           ),
                         ),
                         child: Text(

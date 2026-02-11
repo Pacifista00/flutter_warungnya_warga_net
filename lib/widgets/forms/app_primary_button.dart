@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 
 class AppPrimaryButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed; // ✅ nullable
 
   const AppPrimaryButton({
     super.key,
     required this.text,
-    required this.onPressed,
+    this.onPressed, // ✅ tidak required
   });
 
   @override
@@ -17,12 +18,13 @@ class AppPrimaryButton extends StatelessWidget {
       height: 48,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(50),
           ),
         ),
-        onPressed: onPressed,
+        onPressed: onPressed, // null = disabled
         child: Text(text),
       ),
     );

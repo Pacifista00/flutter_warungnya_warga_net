@@ -1,21 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
+import 'package:flutter_warungnya_warga_net/features/auth/auth_controller_provider.dart';
+import 'package:flutter_warungnya_warga_net/features/auth/domain/auth_exceptions.dart';
 
-class VerifyEmailPage extends StatefulWidget {
-  const VerifyEmailPage({super.key});
+class VerifyEmailPage extends ConsumerStatefulWidget {
+  final String email;
+
+  const VerifyEmailPage({super.key, required this.email});
 
   @override
-  State<VerifyEmailPage> createState() => _VerifyEmailPageState();
+  ConsumerState<VerifyEmailPage> createState() => _VerifyEmailPageState();
 }
 
-class _VerifyEmailPageState extends State<VerifyEmailPage> {
+class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
   final List<TextEditingController> _controllers = List.generate(
     6,
     (_) => TextEditingController(),
   );
 
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+
+  bool _isVerifying = false;
+  bool _isResending = false;
+
+  String get otpCode => _controllers.map((c) => c.text).join();
 
   @override
   void dispose() {
@@ -28,8 +38,85 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     super.dispose();
   }
 
-  String get otpCode => _controllers.map((c) => c.text).join();
+  // VERIFY OTP
+  Future<void> _verifyOtp() async {
+    if (otpCode.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Masukkan 6 digit kode OTP')),
+      );
+      return;
+    }
 
+    setState(() => _isVerifying = true);
+
+    try {
+      await ref
+          .read(authControllerProvider)
+          .verifyOtp(email: widget.email, otp: otpCode);
+
+      if (!mounted) return;
+
+      await showDialog(
+        context: context,
+        builder:
+            (_) => const AlertDialog(
+              title: Text('Berhasil'),
+              content: Text('Email berhasil diverifikasi.'),
+            ),
+      );
+
+      context.go('/login');
+    } on AuthException catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Terjadi kesalahan. Coba lagi.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isVerifying = false);
+      }
+    }
+  }
+
+  // RESEND OTP
+  Future<void> _resendOtp() async {
+    setState(() => _isResending = true);
+
+    try {
+      await ref.read(authControllerProvider).resendOtp(email: widget.email);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Kode berhasil dikirim ulang')),
+      );
+    } on AuthException catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal mengirim ulang kode')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isResending = false);
+      }
+    }
+  }
+
+  // BUILD UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,11 +127,11 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Icon
+              // ICON
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
+                  color: AppColors.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -64,14 +151,26 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
               const SizedBox(height: 12),
 
               const Text(
-                'Masukkan 6 digit kode OTP yang dikirim ke email kamu',
+                'Masukkan 6 digit kode OTP yang dikirim ke',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
 
+              const SizedBox(height: 4),
+
+              Text(
+                widget.email,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+
               const SizedBox(height: 32),
 
-              // OTP Fields
+              // OTP FIELDS
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(6, (index) {
@@ -90,8 +189,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                       onChanged: (value) {
                         if (value.isNotEmpty && index < 5) {
                           _focusNodes[index + 1].requestFocus();
-                        }
-                        if (value.isEmpty && index > 0) {
+                        } else if (value.isEmpty && index > 0) {
                           _focusNodes[index - 1].requestFocus();
                         }
                       },
@@ -102,32 +200,42 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
 
               const SizedBox(height: 32),
 
-              // Verify Button
+              // VERIFY BUTTON
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (otpCode.length == 6) {
-                      // TODO: call verify OTP API
-                      context.go('/login');
-                    }
-                  },
-                  child: const Text(
-                    'Verifikasi',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  onPressed: _isVerifying ? null : _verifyOtp,
+                  child:
+                      _isVerifying
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : const Text(
+                            'Verifikasi',
+                            style: TextStyle(fontSize: 16),
+                          ),
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              // Resend OTP
+              // RESEND BUTTON
               TextButton(
-                onPressed: () {
-                  // TODO: resend OTP API
-                },
-                child: const Text('Kirim Ulang Kode'),
+                onPressed: _isResending ? null : _resendOtp,
+                child:
+                    _isResending
+                        ? const SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Text('Kirim Ulang Kode'),
               ),
 
               const SizedBox(height: 8),

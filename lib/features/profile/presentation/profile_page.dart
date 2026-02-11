@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_warungnya_warga_net/core/ui/app_confirm_dialog.dart';
+import 'package:flutter_warungnya_warga_net/features/auth/auth_controller_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/bottom_nav.dart';
 import 'package:flutter_warungnya_warga_net/features/profile/widgets/profile.header.dart';
@@ -6,11 +9,11 @@ import 'package:flutter_warungnya_warga_net/features/profile/widgets/order_statu
 import 'package:flutter_warungnya_warga_net/features/profile/widgets/info_card.dart';
 import 'package:flutter_warungnya_warga_net/features/profile/widgets/setting_item.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xffF4F5F7),
       body: Column(
@@ -74,6 +77,29 @@ class ProfilePage extends StatelessWidget {
                   icon: Icons.store_outlined,
                   title: 'Lokasi Kami',
                   subtitle: 'Temukan Gudang kami',
+                ),
+                SettingItem(
+                  icon: Icons.logout,
+                  title: 'Logout',
+                  subtitle: 'Keluar dari akun ini',
+                  isDestructive: true,
+                  onTap: () async {
+                    final confirm = await AppConfirmDialog.show(
+                      context,
+                      title: 'Logout',
+                      message: 'Yakin ingin keluar dari akun?',
+                      confirmText: 'Logout',
+                      isDestructive: true,
+                    );
+
+                    if (confirm == true) {
+                      await ref.read(authControllerProvider).logout();
+
+                      if (context.mounted) {
+                        context.go('/login');
+                      }
+                    }
+                  },
                 ),
 
                 const SizedBox(height: 8),

@@ -1,39 +1,106 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_warungnya_warga_net/core/ui/app_dialog.dart';
+import 'package:flutter_warungnya_warga_net/features/auth/domain/auth_exceptions.dart';
+import 'package:go_router/go_router.dart';
+
+import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:flutter_warungnya_warga_net/router/route_rules.dart';
 import 'package:flutter_warungnya_warga_net/widgets/forms/app_primary_button.dart';
 import 'package:flutter_warungnya_warga_net/widgets/forms/app_text_field.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
+import 'package:flutter_warungnya_warga_net/features/auth/auth_controller_provider.dart';
 
-class LoginPage extends ConsumerWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    /// 1. Ambil query parameter 'from'
-    final uri = GoRouterState.of(context).uri;
-    final from = uri.queryParameters['from'] ?? '/home';
+  ConsumerState<LoginPage> createState() => _LoginPageState();
+}
 
+class _LoginPageState extends ConsumerState<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  bool _isLoading = false;
+  late String _from;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    /// ambil query param `from` sekali saja
+    final uri = GoRouterState.of(context).uri;
+    _from = uri.queryParameters['from'] ?? '/home';
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onLoginPressed() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    /// VALIDASI FORM
+    if (email.isEmpty || password.isEmpty) {
+      await AppDialog.show(
+        context,
+        title: 'Form belum lengkap',
+        message: 'Silakan isi email dan password terlebih dahulu.',
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await ref
+          .read(authControllerProvider)
+          .login(email: email, password: password);
+
+      if (!mounted) return;
+      context.go(_from);
+    } catch (e) {
+      if (!mounted) return;
+
+      if (e is EmailNotVerifiedException) {
+        context.go('/verify-email', extra: e.email);
+        return;
+      }
+
+      if (e is InvalidCredentialException) {
+        await AppDialog.show(context, title: 'Login gagal', message: e.message);
+        return;
+      }
+
+      await AppDialog.show(
+        context,
+        title: 'Error',
+        message: 'Terjadi kesalahan. Silakan coba lagi.',
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return PopScope(
-      canPop: false, // Kita matikan back default untuk handle manual
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
 
-        /// 2. Logika "Safe Exit" agar tidak loop
-        // Cek apakah halaman asal adalah protected
         final isFromProtected = protectedRoutes.any(
-          (route) => from.startsWith(route),
+          (route) => _from.startsWith(route),
         );
 
-        if (isFromProtected) {
-          // Jika asal dari /profile dsb, balik ke /produk (sesuai request kamu)
-          context.go('/home');
-        } else {
-          // Jika asal dari halaman public, balik ke halaman tersebut
-          context.go(from);
-        }
+        context.go(isFromProtected ? '/home' : _from);
       },
       child: Scaffold(
         backgroundColor: Colors.grey.shade100,
@@ -41,7 +108,7 @@ class LoginPage extends ConsumerWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                /// HEADER (Sesuai UI kamu)
+                /// HEADER
                 Container(
                   height: 200,
                   width: double.infinity,
@@ -87,35 +154,40 @@ class LoginPage extends ConsumerWidget {
                           ),
                           const SizedBox(height: 24),
 
-                          const AppTextField(
+                          /// EMAIL
+                          AppTextField(
                             label: 'Email',
                             hint: 'login@abcd.com',
                             keyboardType: TextInputType.emailAddress,
+                            controller: _emailController,
                           ),
                           const SizedBox(height: 16),
 
-                          const AppTextField(
+                          /// PASSWORD
+                          AppTextField(
                             label: 'Password',
                             hint: '********',
                             obscureText: true,
+                            controller: _passwordController,
                           ),
                           const SizedBox(height: 24),
 
                           /// LOGIN BUTTON
                           AppPrimaryButton(
-                            text: 'Login',
-                            onPressed: () async {
-                              // TODO: Integrasi Laravel Sanctum di sini
-                              // Jika sukses:
-                              context.go(from);
-                            },
+                            text: _isLoading ? 'Loading...' : 'Login',
+                            onPressed:
+                                _isLoading
+                                    ? null
+                                    : () {
+                                      _onLoginPressed();
+                                    },
                           ),
 
                           const SizedBox(height: 24),
 
-                          /// OR SEPARATOR
-                          Row(
-                            children: const [
+                          /// OR
+                          const Row(
+                            children: [
                               Expanded(child: Divider()),
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 8),
@@ -127,11 +199,10 @@ class LoginPage extends ConsumerWidget {
 
                           const SizedBox(height: 16),
 
+                          /// GOOGLE LOGIN (placeholder)
                           AppPrimaryButton(
                             text: 'Login with Google',
-                            onPressed: () {
-                              // Logic Google Sign-In
-                            },
+                            onPressed: () {},
                           ),
 
                           const SizedBox(height: 24),
@@ -151,8 +222,7 @@ class LoginPage extends ConsumerWidget {
                                     recognizer:
                                         TapGestureRecognizer()
                                           ..onTap = () {
-                                            // Teruskan parameter 'from' ke register
-                                            context.go('/register?from=$from');
+                                            context.go('/register?from=$_from');
                                           },
                                   ),
                                 ],

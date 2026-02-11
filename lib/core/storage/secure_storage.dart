@@ -9,7 +9,7 @@ class SecureStorage {
   }
 
   static Future<String?> getToken() async {
-    return _storage.read(key: _tokenKey);
+    return await _storage.read(key: _tokenKey);
   }
 
   static Future<void> clear() async {

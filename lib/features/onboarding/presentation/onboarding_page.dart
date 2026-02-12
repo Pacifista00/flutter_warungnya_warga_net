@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'onboarding_controller.dart';
 
@@ -166,7 +167,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                       decoration: BoxDecoration(
                         color:
                             _currentIndex == index
-                                ? Colors.blue
+                                ? AppColors.primary
                                 : Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -196,7 +197,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                         onPressed: _next,
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(0, 52),
-                          backgroundColor: Colors.blue,
+                          backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(

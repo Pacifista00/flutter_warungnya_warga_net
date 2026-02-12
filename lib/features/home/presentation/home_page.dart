@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/section/reward_point_section.dart';
+import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/electronic_product_section.dart';
+import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/food_product_section.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/home_header.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/latest_product_section.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/special_offer.dart';
@@ -24,10 +26,12 @@ class HomePage extends StatelessWidget {
             SizedBox(height: 24),
             CategorySection(),
             SizedBox(height: 24),
-            PopularProductSection(),
-            SizedBox(height: 24),
             LatestProductSection(),
-            SizedBox(height: 24),
+            SizedBox(height: 32),
+            FoodProductSection(),
+            SizedBox(height: 32),
+            ElectronicProductSection(),
+            SizedBox(height: 32),
             RewardPointSection(),
             SizedBox(height: 20),
           ],

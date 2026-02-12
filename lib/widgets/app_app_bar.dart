@@ -13,6 +13,9 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
       titleSpacing: 16,
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
       centerTitle: false,
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      scrolledUnderElevation: 0,
       actions: [
         IconButton(
           onPressed: onCartPressed,

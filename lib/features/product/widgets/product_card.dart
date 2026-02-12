@@ -3,7 +3,7 @@ import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 
 class ProductCard extends StatelessWidget {
   final String title;
-  final String description;
+  final String category;
   final String price;
   final String imageUrl;
   final VoidCallback onAddToCart;
@@ -11,7 +11,7 @@ class ProductCard extends StatelessWidget {
   const ProductCard({
     super.key,
     required this.title,
-    required this.description,
+    required this.category,
     required this.price,
     required this.imageUrl,
     required this.onAddToCart,
@@ -21,7 +21,6 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 150,
-      height: 230,
       child: Container(
         margin: const EdgeInsets.only(right: 12),
         decoration: BoxDecoration(
@@ -33,14 +32,14 @@ class ProductCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            /// IMAGE (FIXED HEIGHT)
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(16),
-              ),
-              child: SizedBox(
-                height: 195,
-                width: double.infinity,
+            /// IMAGE
+            SizedBox(
+              height: 160, // sekarang masuk akal
+              width: double.infinity,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
                 child: Image.network(
                   imageUrl,
                   fit: BoxFit.cover,
@@ -68,7 +67,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      description,
+                      category,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -76,9 +75,7 @@ class ProductCard extends StatelessWidget {
                         color: Colors.grey.shade600,
                       ),
                     ),
-
-                    const Spacer(), // 🔥 PUSH PRICE KE BAWAH
-
+                    const Spacer(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

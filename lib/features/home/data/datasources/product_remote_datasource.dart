@@ -18,4 +18,22 @@ class ProductRemoteDatasource {
     final List data = response.data['data'];
     return data.map((e) => ProductModel.fromJson(e)).toList();
   }
+
+  Future<List<ProductModel>> getFoodProducts() async {
+    final response = await dio.get(
+      '/home-products',
+      queryParameters: {'category': 'makanan'},
+    );
+    final List data = response.data['data'];
+    return data.map((e) => ProductModel.fromJson(e)).toList();
+  }
+
+  Future<List<ProductModel>> getElectronicProducts() async {
+    final response = await dio.get(
+      '/home-products',
+      queryParameters: {'category': 'elektronik'},
+    );
+    final List data = response.data['data'];
+    return data.map((e) => ProductModel.fromJson(e)).toList();
+  }
 }

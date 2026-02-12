@@ -12,7 +12,17 @@ class ProductSearchFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06), // shadow tipis
+            blurRadius: 8,
+            offset: const Offset(0, 4), // 👈 shadow ke bawah
+          ),
+        ],
+      ),
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
@@ -41,7 +51,6 @@ class ProductSearchFilterBar extends StatelessWidget {
               height: 48,
               width: 48,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade400),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(Icons.filter_list),

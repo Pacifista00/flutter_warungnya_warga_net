@@ -98,7 +98,7 @@ class _ProductListState extends State<ProductList> {
         crossAxisCount: 2,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 0.65,
+        childAspectRatio: 0.73,
       ),
       itemCount: products.length + (isLoading ? 1 : 0),
       itemBuilder: (context, index) {
@@ -112,7 +112,7 @@ class _ProductListState extends State<ProductList> {
           onTap: () => context.push('/product/${product.id}'),
           child: ProductCard(
             title: product.name,
-            description: product.description,
+            category: product.category,
             price: 'Rp ${product.price}',
             imageUrl: product.imageUrl,
             onAddToCart: () {},

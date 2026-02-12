@@ -61,8 +61,8 @@ class _CategorySectionState extends State<CategorySection> {
                   return Column(
                     children: [
                       Container(
-                        width: 52,
-                        height: 52,
+                        width: 42,
+                        height: 42,
                         decoration: BoxDecoration(
                           color: Colors.blue.shade50,
                           shape: BoxShape.circle,

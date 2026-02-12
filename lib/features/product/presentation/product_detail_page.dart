@@ -35,7 +35,7 @@ class ProductDetailPage extends StatelessWidget {
               children: [
                 // ================= IMAGE =================
                 SizedBox(
-                  height: 280,
+                  height: 320,
                   width: double.infinity,
                   child: Image.network(
                     product.imageUrl,
@@ -88,7 +88,7 @@ class ProductDetailPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        product.description,
+                        product.category,
                         style: const TextStyle(height: 1.5),
                       ),
                     ],

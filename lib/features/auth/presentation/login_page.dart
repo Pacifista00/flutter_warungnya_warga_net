@@ -67,6 +67,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     } catch (e) {
       if (!mounted) return;
 
+      final message = e is AuthException ? e.message : 'Terjadi kesalahan.';
+
+      await AppDialog.show(context, title: 'Error', message: message);
+
       if (e is EmailNotVerifiedException) {
         context.go('/verify-email', extra: e.email);
         return;
@@ -76,12 +80,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         await AppDialog.show(context, title: 'Login gagal', message: e.message);
         return;
       }
-
-      await AppDialog.show(
-        context,
-        title: 'Error',
-        message: 'Terjadi kesalahan. Silakan coba lagi.',
-      );
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

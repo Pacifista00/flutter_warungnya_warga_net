@@ -6,7 +6,6 @@ import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/h
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/latest_product_section.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/special_offer.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/category_section.dart';
-import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/popular_product_section.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/bottom_nav.dart';
 
 class HomePage extends StatelessWidget {

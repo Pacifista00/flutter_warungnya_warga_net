@@ -18,11 +18,7 @@ class AuthController {
   Future<void> login({required String email, required String password}) async {
     await repository.login(email, password);
 
-    final user = await repository.getMe();
-
-    final emailVerifiedAt = user['email_verified_at'];
-
-    authNotifier.loginSuccess(emailVerified: emailVerifiedAt != null);
+    await authNotifier.loginSuccess();
   }
 
   Future<void> register({

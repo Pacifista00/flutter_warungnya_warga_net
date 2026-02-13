@@ -7,43 +7,44 @@ import 'route_rules.dart';
 
 String? routeGuard(Ref ref, String location) {
   final hasOnboarded = ref.read(onboardingProvider);
-  final authStatus = ref.read(authProvider);
+  final authState = ref.read(authProvider);
 
-  // 0️⃣ auth belum siap
-  if (authStatus == AuthStatus.unknown) return null;
+  // 0️⃣ onboarding belum load
+  if (hasOnboarded == null) return null;
 
-  // 1️⃣ onboarding dulu
-  if (!hasOnboarded && location != '/onboarding') {
+  // 1️⃣ auth belum siap
+  if (authState.status == AuthStatus.unknown) return null;
+
+  // 2️⃣ onboarding dulu
+  if (hasOnboarded == false && location != '/onboarding') {
     return '/onboarding';
   }
 
-  // 2️⃣ route PUBLIC → bebas
+  // 3️⃣ route PUBLIC → bebas
   if (publicRoutes.contains(location)) {
-    if (authStatus == AuthStatus.unauthenticated) {
+    if (authState.status == AuthStatus.unauthenticated) {
       ref.read(lastRouteProvider.notifier).state = location;
     }
     return null;
   }
 
-  // 3️⃣ route PROTECTED
+  // 4️⃣ route PROTECTED
   final isProtected = protectedRoutes.any(
     (route) => location.startsWith(route),
   );
 
   if (isProtected) {
-    // belum login
-    if (authStatus == AuthStatus.unauthenticated) {
+    if (authState.status == AuthStatus.unauthenticated) {
       return '/login?from=$location';
     }
 
-    // login tapi email belum verified
-    if (authStatus == AuthStatus.emailNotVerified) {
+    if (authState.status == AuthStatus.emailNotVerified) {
       return '/verify-email';
     }
   }
 
-  // 4️⃣ sudah login tapi masih di login/register
-  if (authStatus == AuthStatus.authenticated &&
+  // 5️⃣ sudah login tapi masih di login/register
+  if (authState.status == AuthStatus.authenticated &&
       (location == '/login' || location == '/register')) {
     return '/home';
   }

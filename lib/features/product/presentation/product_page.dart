@@ -1,22 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/bottom_nav.dart';
 import 'package:flutter_warungnya_warga_net/widgets/app_app_bar.dart';
 import '../widgets/product_search_filter_bar.dart';
 import '../widgets/product_filter_sheet.dart';
 import '../widgets/product_list.dart';
-import 'package:go_router/go_router.dart';
 
 class ProdukPage extends StatefulWidget {
-  const ProdukPage({super.key});
+  final String initialSearch;
+  const ProdukPage({super.key, this.initialSearch = ''});
 
   @override
   State<ProdukPage> createState() => _ProdukPageState();
 }
 
 class _ProdukPageState extends State<ProdukPage> {
-  String searchQuery = '';
-  int selectedCategory = 0;
+  String selectedCategory = ''; // slug
   SortType selectedSort = SortType.terbaru;
+  late String searchQuery;
+
+  @override
+  void initState() {
+    super.initState();
+    searchQuery = widget.initialSearch;
+  }
+
+  void _openFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder:
+          (_) => ProductFilterSheet(
+            selectedCategory: selectedCategory,
+            selectedSort: selectedSort,
+            onApply: (category, sort) {
+              setState(() {
+                selectedCategory = category;
+                selectedSort = sort;
+              });
+            },
+          ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +53,7 @@ class _ProdukPageState extends State<ProdukPage> {
       appBar: AppAppBar(
         title: 'Produk',
         onCartPressed: () {
-          context.push('/cart'); // 👈 KE SINI
+          context.push('/cart');
         },
       ),
       body: Column(
@@ -33,32 +62,16 @@ class _ProdukPageState extends State<ProdukPage> {
             onSearchChanged: (value) {
               setState(() => searchQuery = value);
             },
-            onFilterPressed: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                ),
-                builder:
-                    (_) => ProductFilterSheet(
-                      selectedCategory: selectedCategory,
-                      selectedSort: selectedSort,
-                      onApply: (category, sort) {
-                        setState(() {
-                          selectedCategory = category;
-                          selectedSort = sort;
-                        });
-                      },
-                    ),
-              );
-            },
+            onFilterPressed: _openFilterSheet,
           ),
           Expanded(
             child: ProductList(
+              key: ValueKey(
+                '$searchQuery-$selectedCategory-${selectedSort.name}',
+              ),
               searchQuery: searchQuery,
               selectedCategory: selectedCategory,
-              selectedSort: selectedSort, // tambahin di ProductList
+              selectedSort: selectedSort,
             ),
           ),
         ],

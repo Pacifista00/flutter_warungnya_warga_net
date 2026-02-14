@@ -34,7 +34,7 @@ class ProductCard extends StatelessWidget {
           children: [
             /// IMAGE
             SizedBox(
-              height: 160, // sekarang masuk akal
+              height: 160,
               width: double.infinity,
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(
@@ -75,7 +75,7 @@ class ProductCard extends StatelessWidget {
                         color: Colors.grey.shade600,
                       ),
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 4),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -84,6 +84,7 @@ class ProductCard extends StatelessWidget {
                           style: const TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
                         ),
                         InkWell(

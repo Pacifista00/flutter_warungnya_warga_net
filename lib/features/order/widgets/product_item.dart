@@ -21,7 +21,7 @@ class ProductItem extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                'https://thru-abu-assumption-expect.trycloudflare.com/storage/products/doi7OSFres9HXG1QP1WBMf095tkdwSZy0ttI0uaO.webp', // ukuran gambar bebas
+                'https://visits-humanitarian-significant-shanghai.trycloudflare.com/storage/products/doi7OSFres9HXG1QP1WBMf095tkdwSZy0ttI0uaO.webp', // ukuran gambar bebas
                 fit: BoxFit.cover, // ⬅️ WAJIB
               ),
             ),

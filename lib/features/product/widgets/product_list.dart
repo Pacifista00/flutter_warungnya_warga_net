@@ -7,7 +7,7 @@ import 'product_filter_sheet.dart';
 
 class ProductList extends StatefulWidget {
   final String searchQuery;
-  final int selectedCategory;
+  final String selectedCategory;
   final SortType selectedSort;
 
   const ProductList({
@@ -30,17 +30,18 @@ class _ProductListState extends State<ProductList> {
   int currentPage = 1;
   int lastPage = 1;
   bool isLoading = false;
+  bool isFirstLoad = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchProducts();
+    _fetchProducts(reset: true);
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent - 200 &&
           !isLoading &&
-          currentPage < lastPage) {
+          currentPage <= lastPage) {
         _fetchProducts();
       }
     });
@@ -48,36 +49,53 @@ class _ProductListState extends State<ProductList> {
 
   @override
   void didUpdateWidget(covariant ProductList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
     if (oldWidget.searchQuery != widget.searchQuery ||
         oldWidget.selectedCategory != widget.selectedCategory ||
         oldWidget.selectedSort != widget.selectedSort) {
-      products.clear();
-      currentPage = 1;
-      lastPage = 1;
-
-      _scrollController.jumpTo(0);
-      _fetchProducts();
+      _fetchProducts(reset: true);
     }
-    super.didUpdateWidget(oldWidget);
   }
 
-  Future<void> _fetchProducts() async {
+  Future<void> _fetchProducts({bool reset = false}) async {
     if (isLoading) return;
 
-    setState(() => isLoading = true);
+    if (reset) {
+      currentPage = 1;
+      lastPage = 1;
+      products.clear();
 
-    final result = await _datasource.getProducts(
-      page: currentPage,
-      search: widget.searchQuery,
-      category: widget.selectedCategory,
-      sort: widget.selectedSort,
-    );
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(0);
+      }
+    }
 
     setState(() {
-      products.addAll(result.products);
-      lastPage = result.lastPage;
-      currentPage++;
+      isLoading = true;
+      if (reset) isFirstLoad = true;
+    });
+
+    try {
+      final result = await _datasource.getProducts(
+        page: currentPage,
+        search: widget.searchQuery,
+        category: widget.selectedCategory,
+        sort: widget.selectedSort,
+      );
+
+      setState(() {
+        products.addAll(result.products);
+        lastPage = result.lastPage;
+        currentPage++;
+      });
+    } catch (e) {
+      debugPrint("Error fetch products: $e");
+    }
+
+    setState(() {
       isLoading = false;
+      isFirstLoad = false;
     });
   }
 

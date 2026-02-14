@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/core/constant/product_categories.dart';
 
-enum SortType { terbaru, hargaTermurah, hargaTermahal }
+enum SortType { terbaru, hargaTermurah, hargaTermahal, namaAZ }
 
 class ProductFilterSheet extends StatefulWidget {
-  final int selectedCategory;
+  final String selectedCategory;
   final SortType selectedSort;
-  final Function(int, SortType) onApply;
+  final Function(String, SortType) onApply;
 
   const ProductFilterSheet({
     super.key,
@@ -14,22 +15,12 @@ class ProductFilterSheet extends StatefulWidget {
     required this.onApply,
   });
 
-  static const categories = [
-    'Semua',
-    'Kimia',
-    'Alat',
-    'Bahan',
-    'Kimia',
-    'Alat',
-    'Bahan',
-  ];
-
   @override
   State<ProductFilterSheet> createState() => _ProductFilterSheetState();
 }
 
 class _ProductFilterSheetState extends State<ProductFilterSheet> {
-  late int category;
+  late String category;
   late SortType sortType;
 
   @override
@@ -59,14 +50,16 @@ class _ProductFilterSheetState extends State<ProductFilterSheet> {
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
-              children: List.generate(
-                ProductFilterSheet.categories.length,
-                (index) => ChoiceChip(
-                  label: Text(ProductFilterSheet.categories[index]),
-                  selected: category == index,
-                  onSelected: (_) => setState(() => category = index),
-                ),
-              ),
+              children:
+                  productCategories.map((cat) {
+                    return ChoiceChip(
+                      label: Text(cat.label),
+                      selected: category == cat.slug,
+                      onSelected: (_) {
+                        setState(() => category = cat.slug);
+                      },
+                    );
+                  }).toList(),
             ),
 
             const SizedBox(height: 16),
@@ -98,10 +91,11 @@ class _ProductFilterSheetState extends State<ProductFilterSheet> {
                   child: OutlinedButton(
                     onPressed: () {
                       setState(() {
-                        category = 0;
+                        category = '';
                         sortType = SortType.terbaru;
                       });
                     },
+
                     child: const Text('Reset'),
                   ),
                 ),
@@ -131,6 +125,8 @@ class _ProductFilterSheetState extends State<ProductFilterSheet> {
         return 'Harga Termurah';
       case SortType.hargaTermahal:
         return 'Harga Termahal';
+      case SortType.namaAZ:
+        return 'Nama (A–Z)';
     }
   }
 }

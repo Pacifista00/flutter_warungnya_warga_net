@@ -40,7 +40,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // PROTECTED (LOGIN REQUIRED)
       GoRoute(path: '/home', builder: (_, __) => const HomePage()),
-      GoRoute(path: '/produk', builder: (_, __) => const ProdukPage()),
+      GoRoute(
+        path: '/produk',
+        builder: (context, state) {
+          final search = state.uri.queryParameters['search'] ?? '';
+          return ProdukPage(initialSearch: search);
+        },
+      ),
 
       GoRoute(
         path: '/product/:id',

@@ -128,6 +128,11 @@ class HeaderSection extends ConsumerWidget {
           const SizedBox(height: 14),
 
           TextField(
+            onSubmitted: (value) {
+              if (value.trim().isNotEmpty) {
+                context.push('/produk?search=${Uri.encodeComponent(value)}');
+              }
+            },
             decoration: InputDecoration(
               hintText: 'Search',
               prefixIcon: const Icon(Icons.search),

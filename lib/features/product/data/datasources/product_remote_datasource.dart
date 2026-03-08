@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_warungnya_warga_net/core/network/dio.dart';
+import 'package:flutter_warungnya_warga_net/core/network/dio_client.dart';
 import 'package:flutter_warungnya_warga_net/features/product/enums/product_sort_mapper.dart';
 import 'package:flutter_warungnya_warga_net/features/product/models/product_model.dart';
 import 'package:flutter_warungnya_warga_net/features/product/models/product_pagination.dart';
@@ -20,18 +20,17 @@ class ProductRemoteDatasource {
       queryParameters: {
         'page': page,
         if (search.isNotEmpty) 'search': search,
-        if (category.isNotEmpty) 'category': category, // 👈 SLUG
+        if (category.isNotEmpty) 'category': category,
         'sort': sort.apiValue,
       },
     );
 
+    final List listData = response.data['data'] ?? [];
+
     return ProductPagination(
-      products:
-          (response.data['data'] as List)
-              .map((e) => ProductModel.fromJson(e))
-              .toList(),
-      currentPage: response.data['meta']['current_page'],
-      lastPage: response.data['meta']['last_page'],
+      products: listData.map((e) => ProductModel.fromJson(e)).toList(),
+      currentPage: response.data['meta']?['current_page'] ?? 1,
+      lastPage: response.data['meta']?['last_page'] ?? 1,
     );
   }
 

@@ -32,26 +32,26 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       title: 'Mulai Lebih Mudah',
       description:
           'Temukan produk impianmu dengan kualitas terbaik. Pengalaman belanja yang mudah, cepat, dan pastinya bikin kamu senyum terus. ',
-      image: 'assets/images/onboarding/000.jpg',
+      image: 'assets/images/onboarding/onboard1.png',
     ),
     OnboardingItem(
       title: 'Belanja Tanpa Rasa Khawatir',
       description:
           'Setiap pembelianmu dilindungi oleh garansi penuh. Belanja lebih tenang dengan sistem pembayaran yang terjamin keamanannya.  ',
-      image: 'assets/images/onboarding/000.jpg',
+      image: 'assets/images/onboarding/onboard2.png',
     ),
     OnboardingItem(
       title: 'Pilih Tanpa Ribet',
       description:
           'Jelajahi ribuan koleksi produk berkualitas dan dapatkan barang favoritmu lebih mudah tanpa perlu menunggu lama.',
-      image: 'assets/images/onboarding/000.jpg',
+      image: 'assets/images/onboarding/onboard3.png',
     ),
-    OnboardingItem(
-      title: 'Siap Untuk Mulai Belanja?',
-      description:
-          'Mulai cari barang impianmu hari ini. Masuk ke akunmu untuk melihat daftar keinginan, atau langsung mulai mencari produk favoritmu sekarang.',
-      image: 'assets/images/onboarding/000.jpg',
-    ),
+    // OnboardingItem(
+    //   title: 'Siap Untuk Mulai Belanja?',
+    //   description:
+    //       'Mulai cari barang impianmu hari ini. Masuk ke akunmu untuk melihat daftar keinginan, atau langsung mulai mencari produk favoritmu sekarang.',
+    //   image: 'assets/images/onboarding/000.jpg',
+    // ),
   ];
 
   void _next() async {

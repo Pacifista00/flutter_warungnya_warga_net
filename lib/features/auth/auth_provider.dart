@@ -48,7 +48,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final user = await repository.getMe();
 
-      state = AuthState(status: AuthStatus.authenticated, user: user);
+      final emailVerifiedAt = user['email_verified_at'];
+      print("EMAIL VERIFIED AT: ${user['email_verified_at']}");
+
+      if (emailVerifiedAt == null) {
+        state = AuthState(status: AuthStatus.emailNotVerified, user: user);
+      } else {
+        state = AuthState(status: AuthStatus.authenticated, user: user);
+      }
     } on DioException catch (e) {
       final message =
           e.response?.data?['message'] ?? 'Gagal mengambil data user.';

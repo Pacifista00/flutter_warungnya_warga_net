@@ -1,4 +1,4 @@
-import 'package:flutter_warungnya_warga_net/config/env/dev_env.dart';
+import 'package:flutter_warungnya_warga_net/config/env/prod_env.dart';
 
 class ProductModel {
   final String id;
@@ -17,14 +17,14 @@ class ProductModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: json['id'].toString(),
-      name: json['name'],
-      category: json['category']['name'],
-      price: json['price'].toString(),
-      image: json['image'],
+      id: json['id']?.toString() ?? '',
+      name: json['name'] ?? '',
+      category: json['category']?['name'] ?? '',
+      price: json['price']?.toString() ?? '0',
+      image: json['image'] ?? '',
     );
   }
 
   /// 🔥 URL IMAGE FULL
-  String get imageUrl => '${DevEnv.storageUrl}/$image';
+  String get imageUrl => '${ProdEnv.storageUrl}/$image';
 }

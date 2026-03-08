@@ -33,7 +33,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/verify-email',
         builder: (context, state) {
-          final email = state.extra as String;
+          final email = state.extra as String? ?? '';
           return VerifyEmailPage(email: email);
         },
       ),
@@ -51,7 +51,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/product/:id',
         builder: (_, state) {
-          final id = state.pathParameters['id']!;
+          final id = state.pathParameters['id'] ?? '';
           return ProductDetailPage(productId: id);
         },
       ),

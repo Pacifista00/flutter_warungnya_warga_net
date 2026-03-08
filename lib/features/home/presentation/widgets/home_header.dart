@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_warungnya_warga_net/config/env/prod_env.dart';
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:flutter_warungnya_warga_net/features/auth/auth_provider.dart';
 import 'package:flutter_warungnya_warga_net/features/auth/domain/auth_state.dart';
@@ -39,7 +40,9 @@ class HeaderSection extends ConsumerWidget {
                           backgroundColor: Colors.white,
                           backgroundImage:
                               user['photo'] != null
-                                  ? NetworkImage(user['photo'])
+                                  ? NetworkImage(
+                                    "${ProdEnv.storageUrl}/${user['photo']}",
+                                  )
                                   : null,
                           child:
                               user['photo'] == null

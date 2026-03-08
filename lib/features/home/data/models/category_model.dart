@@ -1,4 +1,4 @@
-import 'package:flutter_warungnya_warga_net/config/env/dev_env.dart';
+import 'package:flutter_warungnya_warga_net/config/env/prod_env.dart';
 
 class CategoryModel {
   final String id;
@@ -23,5 +23,5 @@ class CategoryModel {
   }
 
   /// 🔥 URL ICON SIAP PAKAI
-  String get iconUrl => '${DevEnv.storageUrl}/$icon';
+  String get iconUrl => '${ProdEnv.storageUrl}/$icon';
 }

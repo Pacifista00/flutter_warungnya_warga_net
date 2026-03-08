@@ -1,4 +1,4 @@
-import 'package:flutter_warungnya_warga_net/config/env/dev_env.dart';
+import 'package:flutter_warungnya_warga_net/config/env/prod_env.dart';
 
 class ProductModel {
   final String id;
@@ -24,5 +24,5 @@ class ProductModel {
       image: json['image'],
     );
   }
-  String get imageUrl => '${DevEnv.storageUrl}/$image';
+  String get imageUrl => '${ProdEnv.storageUrl}/$image';
 }

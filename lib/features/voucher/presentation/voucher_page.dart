@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/bottom_nav.dart';
 import 'package:flutter_warungnya_warga_net/features/voucher/data/voucher_remote_datasource.dart';
+import 'package:flutter_warungnya_warga_net/features/voucher/widgets/voucher_list_skeleton.dart';
 import 'package:flutter_warungnya_warga_net/widgets/app_app_bar.dart';
 import '../widgets/voucher_card.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,7 @@ class VoucherPage extends StatelessWidget {
         future: datasource.getVouchers(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const VoucherListSkeleton();
           }
 
           if (snapshot.hasError) {

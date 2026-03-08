@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/product_card_sekeleton.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_warungnya_warga_net/features/home/data/datasources/product_remote_datasource.dart';
 import 'package:flutter_warungnya_warga_net/features/home/data/models/product_model.dart';
@@ -38,14 +39,14 @@ class _ElectronicProductSectionState extends State<ElectronicProductSection> {
             future: _futureProducts,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return const ProductCardSkeleton();
               }
 
               if (snapshot.hasError) {
                 return const Center(child: Text('Gagal memuat produk'));
               }
 
-              final products = snapshot.data!;
+              final products = snapshot.data ?? [];
 
               if (products.isEmpty) {
                 return const Center(child: Text('Produk tidak tersedia'));
@@ -54,6 +55,7 @@ class _ElectronicProductSectionState extends State<ElectronicProductSection> {
               return ListView.builder(
                 padding: const EdgeInsets.only(left: 16),
                 scrollDirection: Axis.horizontal,
+                cacheExtent: 500,
                 itemCount: products.length,
                 itemBuilder: (context, index) {
                   final product = products[index];

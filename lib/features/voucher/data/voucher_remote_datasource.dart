@@ -14,4 +14,11 @@ class VoucherRemoteDatasource {
     final List data = response.data['data'];
     return data.map((e) => VoucherModel.fromJson(e)).toList();
   }
+
+  Future<VoucherModel> getVoucherById(String id) async {
+    final response = await dio.get('/voucher/$id');
+
+    final data = response.data['data'];
+    return VoucherModel.fromJson(data);
+  }
 }

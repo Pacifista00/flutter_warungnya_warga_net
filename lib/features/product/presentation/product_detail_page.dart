@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:flutter_warungnya_warga_net/features/product/data/datasources/product_remote_datasource.dart';
 import 'package:flutter_warungnya_warga_net/features/product/models/product_model.dart';
+import 'package:flutter_warungnya_warga_net/features/product/widgets/product_detail_skeleton.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final String productId;
@@ -15,12 +16,13 @@ class ProductDetailPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Detail Produk'),
         backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
       ),
       body: FutureBuilder<ProductModel>(
         future: ProductRemoteDatasource().getProductById(productId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const ProductDetailSkeleton();
           }
 
           if (snapshot.hasError) {
@@ -125,7 +127,7 @@ class ProductDetailPage extends StatelessWidget {
               },
               child: const Text(
                 'Tambah ke Keranjang',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16, color: Colors.white),
               ),
             ),
           ),

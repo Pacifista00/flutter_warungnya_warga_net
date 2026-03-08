@@ -3,6 +3,7 @@ class VoucherModel {
   final String code;
   final String name;
   final String type;
+  final String? description;
   final int value;
   final int maxDiscount;
   final int minOrderAmount;
@@ -17,6 +18,7 @@ class VoucherModel {
     required this.code,
     required this.name,
     required this.type,
+    required this.description,
     required this.value,
     required this.maxDiscount,
     required this.minOrderAmount,
@@ -33,6 +35,7 @@ class VoucherModel {
       code: json['code'],
       name: json['name'],
       type: json['type'],
+      description: json['description'],
       value: json['value'],
       maxDiscount: json['max_discount'],
       minOrderAmount: json['min_order_amount'],

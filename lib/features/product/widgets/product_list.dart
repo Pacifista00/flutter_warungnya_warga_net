@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/features/product/widgets/product_list_skeleton.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_warungnya_warga_net/features/product/data/datasources/product_remote_datasource.dart';
 import 'package:flutter_warungnya_warga_net/features/product/models/product_model.dart';
@@ -88,21 +89,23 @@ class _ProductListState extends State<ProductList> {
         products.addAll(result.products);
         lastPage = result.lastPage;
         currentPage++;
+        isLoading = false;
+        isFirstLoad = false;
       });
     } catch (e) {
       debugPrint("Error fetch products: $e");
-    }
 
-    setState(() {
-      isLoading = false;
-      isFirstLoad = false;
-    });
+      setState(() {
+        isLoading = false;
+        isFirstLoad = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (products.isEmpty && isLoading) {
-      return const Center(child: CircularProgressIndicator());
+    if (isFirstLoad && isLoading) {
+      return const ProductListSkeleton();
     }
 
     if (products.isEmpty) {
@@ -121,7 +124,10 @@ class _ProductListState extends State<ProductList> {
       itemCount: products.length + (isLoading ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == products.length) {
-          return const Center(child: CircularProgressIndicator());
+          return const Padding(
+            padding: EdgeInsets.all(32),
+            child: Center(child: CircularProgressIndicator()),
+          );
         }
 
         final product = products[index];

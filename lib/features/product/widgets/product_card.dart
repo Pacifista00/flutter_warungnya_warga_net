@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends StatefulWidget {
   final String title;
   final String category;
   final String price;
   final String imageUrl;
-  final VoidCallback onAddToCart;
+  final Future<void> Function() onAddToCart;
 
   const ProductCard({
     super.key,
@@ -16,6 +16,31 @@ class ProductCard extends StatelessWidget {
     required this.imageUrl,
     required this.onAddToCart,
   });
+
+  @override
+  State<ProductCard> createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  bool isLoading = false;
+
+  Future<void> _handleAddToCart() async {
+    if (isLoading) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      await widget.onAddToCart();
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +66,7 @@ class ProductCard extends StatelessWidget {
                   top: Radius.circular(16),
                 ),
                 child: Image.network(
-                  imageUrl,
+                  widget.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder:
                       (_, __, ___) => Container(color: Colors.grey.shade300),
@@ -57,7 +82,7 @@ class ProductCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      widget.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -67,7 +92,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      category,
+                      widget.category,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -76,19 +101,22 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          price,
+                          widget.price,
                           style: const TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
+
+                        /// CART BUTTON
                         InkWell(
-                          onTap: onAddToCart,
+                          onTap: isLoading ? null : _handleAddToCart,
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
                             padding: const EdgeInsets.all(6),
@@ -96,11 +124,21 @@ class ProductCard extends StatelessWidget {
                               color: AppColors.primary,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Icon(
-                              Icons.shopping_cart_outlined,
-                              color: Colors.white,
-                              size: 18,
-                            ),
+                            child:
+                                isLoading
+                                    ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                    : const Icon(
+                                      Icons.shopping_cart_outlined,
+                                      color: Colors.white,
+                                      size: 18,
+                                    ),
                           ),
                         ),
                       ],

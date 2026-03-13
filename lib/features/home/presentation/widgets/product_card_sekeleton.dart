@@ -17,11 +17,12 @@ class ProductCardSkeleton extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.only(right: 12),
             child: ProductCard(
+              productId: '',
               title: 'Loading product',
               description: 'Loading description',
               price: 'Rp 0',
               imageUrl: '',
-              onAddToCart: () {},
+              onAddToCart: () async {},
             ),
           );
         },

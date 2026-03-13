@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/services/cart_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_warungnya_warga_net/features/home/data/datasources/product_remote_datasource.dart';
 import 'package:flutter_warungnya_warga_net/features/home/data/models/product_model.dart';
@@ -14,6 +15,7 @@ class PopularProductSection extends StatefulWidget {
 
 class _PopularProductSectionState extends State<PopularProductSection> {
   final ProductRemoteDatasource _datasource = ProductRemoteDatasource();
+  final cartService = CartService();
 
   late Future<List<ProductModel>> _futureProducts;
 
@@ -53,6 +55,7 @@ class _PopularProductSectionState extends State<PopularProductSection> {
               return ListView.builder(
                 padding: const EdgeInsets.only(left: 16),
                 scrollDirection: Axis.horizontal,
+                cacheExtent: 500,
                 itemCount: products.length,
                 itemBuilder: (context, index) {
                   final product = products[index];
@@ -62,12 +65,34 @@ class _PopularProductSectionState extends State<PopularProductSection> {
                       context.push('/product/${product.id}');
                     },
                     child: ProductCard(
+                      productId: product.id,
                       title: product.name,
                       description: product.description,
                       price: 'Rp ${product.price}',
                       imageUrl: product.imageUrl,
-                      onAddToCart: () {
-                        // TODO: add to cart
+                      onAddToCart: () async {
+                        try {
+                          await cartService.addToCart(
+                            productId: product.id,
+                            quantity: 1,
+                          );
+
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Produk ditambahkan ke keranjang",
+                                ),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
+                        }
                       },
                     ),
                   );

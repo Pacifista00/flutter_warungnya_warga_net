@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/services/cart_service.dart';
 import 'package:flutter_warungnya_warga_net/features/product/widgets/product_list_skeleton.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_warungnya_warga_net/features/product/data/datasources/product_remote_datasource.dart';
@@ -25,6 +26,7 @@ class ProductList extends StatefulWidget {
 class _ProductListState extends State<ProductList> {
   final ScrollController _scrollController = ScrollController();
   final ProductRemoteDatasource _datasource = ProductRemoteDatasource();
+  final CartService _cartService = CartService();
 
   List<ProductModel> products = [];
 
@@ -139,7 +141,28 @@ class _ProductListState extends State<ProductList> {
             category: product.category,
             price: 'Rp ${product.price}',
             imageUrl: product.imageUrl,
-            onAddToCart: () {},
+            onAddToCart: () async {
+              try {
+                await _cartService.addToCart(
+                  productId: (product.id),
+                  quantity: 1,
+                );
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Produk ditambahkan ke keranjang"),
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(e.toString())));
+                }
+              }
+            },
           ),
         );
       },

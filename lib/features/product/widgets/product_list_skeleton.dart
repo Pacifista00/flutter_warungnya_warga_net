@@ -24,7 +24,7 @@ class ProductListSkeleton extends StatelessWidget {
             category: 'Loading',
             price: 'Rp 0',
             imageUrl: '',
-            onAddToCart: () {},
+            onAddToCart: () async {},
           );
         },
       ),

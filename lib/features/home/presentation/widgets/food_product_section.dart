@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/services/cart_service.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/product_card_sekeleton.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_warungnya_warga_net/features/home/data/datasources/product_remote_datasource.dart';
@@ -15,6 +16,7 @@ class FoodProductSection extends StatefulWidget {
 
 class _FoodProductSectionState extends State<FoodProductSection> {
   final ProductRemoteDatasource _datasource = ProductRemoteDatasource();
+  final cartService = CartService();
 
   late Future<List<ProductModel>> _futureProducts;
 
@@ -69,12 +71,34 @@ class _FoodProductSectionState extends State<FoodProductSection> {
                       context.push('/product/${product.id}');
                     },
                     child: ProductCard(
+                      productId: product.id,
                       title: product.name,
                       description: product.description,
                       price: 'Rp ${product.price}',
                       imageUrl: product.imageUrl,
-                      onAddToCart: () {
-                        // TODO: add to cart
+                      onAddToCart: () async {
+                        try {
+                          await cartService.addToCart(
+                            productId: product.id,
+                            quantity: 1,
+                          );
+
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Produk ditambahkan ke keranjang",
+                                ),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
+                        }
                       },
                     ),
                   );

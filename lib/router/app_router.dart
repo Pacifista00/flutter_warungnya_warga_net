@@ -44,7 +44,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/produk',
         builder: (context, state) {
           final search = state.uri.queryParameters['search'] ?? '';
-          return ProdukPage(initialSearch: search);
+          final category = state.uri.queryParameters['category'] ?? '';
+
+          return ProdukPage(initialSearch: search, initialCategory: category);
         },
       ),
 

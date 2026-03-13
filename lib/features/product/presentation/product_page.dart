@@ -9,7 +9,12 @@ import '../widgets/product_list.dart';
 
 class ProdukPage extends StatefulWidget {
   final String initialSearch;
-  const ProdukPage({super.key, this.initialSearch = ''});
+  final String initialCategory;
+  const ProdukPage({
+    super.key,
+    this.initialSearch = '',
+    this.initialCategory = '',
+  });
 
   @override
   State<ProdukPage> createState() => _ProdukPageState();
@@ -24,6 +29,7 @@ class _ProdukPageState extends State<ProdukPage> {
   void initState() {
     super.initState();
     searchQuery = widget.initialSearch;
+    selectedCategory = widget.initialCategory;
   }
 
   void _openFilterSheet() {

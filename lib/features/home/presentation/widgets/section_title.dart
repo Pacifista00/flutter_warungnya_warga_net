@@ -18,17 +18,19 @@ class SectionTitle extends StatelessWidget {
             title,
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const Spacer(),
-          GestureDetector(
-            onTap: onTap,
-            child: const Text(
-              'See All',
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w500,
+          if (onTap != null) ...[
+            const Spacer(),
+            GestureDetector(
+              onTap: onTap,
+              child: const Text(
+                'See All',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );

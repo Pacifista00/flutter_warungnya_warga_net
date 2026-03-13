@@ -30,7 +30,12 @@ class _ElectronicProductSectionState extends State<ElectronicProductSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionTitle(title: 'Produk Elektronik'),
+        SectionTitle(
+          title: 'Produk Elektronik',
+          onTap: () {
+            context.push('/produk?category=elektronik');
+          },
+        ),
         const SizedBox(height: 12),
 
         SizedBox(

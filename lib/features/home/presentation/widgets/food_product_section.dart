@@ -29,7 +29,12 @@ class _FoodProductSectionState extends State<FoodProductSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionTitle(title: 'Produk Makanan'),
+        SectionTitle(
+          title: 'Produk Makanan',
+          onTap: () {
+            context.push('/produk?category=makanan');
+          },
+        ),
         const SizedBox(height: 12),
 
         SizedBox(

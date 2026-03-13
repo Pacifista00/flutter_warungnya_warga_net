@@ -50,16 +50,27 @@ class _ProductFilterSheetState extends State<ProductFilterSheet> {
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
-              children:
-                  productCategories.map((cat) {
-                    return ChoiceChip(
-                      label: Text(cat.label),
-                      selected: category == cat.slug,
-                      onSelected: (_) {
-                        setState(() => category = cat.slug);
-                      },
-                    );
-                  }).toList(),
+              children: [
+                /// SEMUA (manual)
+                ChoiceChip(
+                  label: const Text('Semua'),
+                  selected: category == '',
+                  onSelected: (_) {
+                    setState(() => category = '');
+                  },
+                ),
+
+                /// CATEGORY DARI CONSTANT
+                ...productCategories.map((cat) {
+                  return ChoiceChip(
+                    label: Text(cat.label),
+                    selected: category == cat.slug,
+                    onSelected: (_) {
+                      setState(() => category = cat.slug);
+                    },
+                  );
+                }),
+              ],
             ),
 
             const SizedBox(height: 16),

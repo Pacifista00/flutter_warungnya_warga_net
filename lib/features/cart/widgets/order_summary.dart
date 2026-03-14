@@ -1,41 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/models/cart_model.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/models/shipping_model.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/widgets/shipping_dropdown.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/widgets/voucher_form.dart';
 
-class OrderSummaryCard extends StatefulWidget {
-  const OrderSummaryCard({super.key});
+class OrderSummaryCard extends StatelessWidget {
+  final List<CartItem> cartItems;
+  final int shippingCost;
+  final int discount;
 
-  @override
-  State<OrderSummaryCard> createState() => _OrderSummaryCardState();
-}
+  final Function(ShippingModel) onShippingChanged;
+  final Function(int, String?) onVoucherApplied;
 
-class _OrderSummaryCardState extends State<OrderSummaryCard> {
-  final TextEditingController _voucherController = TextEditingController();
-  String? _voucherMessage;
-  bool _voucherApplied = false;
+  const OrderSummaryCard({
+    super.key,
+    required this.cartItems,
+    required this.shippingCost,
+    required this.discount,
+    required this.onShippingChanged,
+    required this.onVoucherApplied,
+  });
 
-  @override
-  void dispose() {
-    _voucherController.dispose();
-    super.dispose();
-  }
-
-  void _applyVoucher() {
-    if (_voucherController.text.trim().toUpperCase() == 'DISKON10') {
-      setState(() {
-        _voucherApplied = true;
-        _voucherMessage = 'Voucher berhasil digunakan 🎉';
-      });
-    } else {
-      setState(() {
-        _voucherApplied = false;
-        _voucherMessage = 'Kode voucher tidak valid';
-      });
-    }
+  int get subtotal {
+    return cartItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
   }
 
   @override
   Widget build(BuildContext context) {
+    final total = subtotal + shippingCost - discount;
+
     return Container(
-      margin: const EdgeInsets.only(top: 8),
+      margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -53,90 +48,21 @@ class _OrderSummaryCardState extends State<OrderSummaryCard> {
           ),
           const SizedBox(height: 12),
 
-          _summaryRow('Sub Total', 'Rp 250.000'),
-          _summaryRow('Biaya Pengiriman', 'Rp 20.000'),
-          _summaryRow(
-            'Diskon',
-            _voucherApplied ? '- Rp 25.000' : 'Rp 0',
-            valueColor: _voucherApplied ? Colors.green : Colors.black,
-          ),
+          _summaryRow('Sub Total', _format(subtotal)),
+          _summaryRow('Biaya Pengiriman', _format(shippingCost)),
+          _summaryRow('Diskon', "- ${_format(discount)}"),
 
           const Divider(height: 24),
 
-          // 🎟️ FORM VOUCHER
-          const Text('Voucher', style: TextStyle(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
+          ShippingDropdown(onChanged: onShippingChanged),
 
-          // 📦 PILIH PENGIRIMAN
-          const Text(
-            'Pilih Pengiriman',
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
 
-          DropdownButtonFormField<String>(
-            value: 'regular',
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 12,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            items: const [
-              DropdownMenuItem(
-                value: 'regular',
-                child: Text('Regular (2-3 hari)'),
-              ),
-              DropdownMenuItem(
-                value: 'express',
-                child: Text('Express (1 hari)'),
-              ),
-            ],
-            onChanged: (value) {},
-          ),
-          const Divider(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _voucherController,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan kode voucher',
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              SizedBox(
-                height: 48,
-                width: 100, // 🔥 WAJIB ADA
-                child: ElevatedButton(
-                  onPressed: _applyVoucher,
-                  child: const Text('Apply'),
-                ),
-              ),
-            ],
-          ),
+          VoucherForm(onApplied: onVoucherApplied),
 
-          if (_voucherMessage != null) ...[
-            const SizedBox(height: 6),
-            Text(
-              _voucherMessage!,
-              style: TextStyle(
-                fontSize: 12,
-                color: _voucherApplied ? Colors.green : Colors.red,
-              ),
-            ),
-          ],
+          // const SizedBox(height: 16),
+
+          // _summaryRow('Total', _format(total), valueColor: Colors.green),
         ],
       ),
     );
@@ -160,5 +86,9 @@ class _OrderSummaryCardState extends State<OrderSummaryCard> {
         ],
       ),
     );
+  }
+
+  String _format(int value) {
+    return "Rp ${value.toString().replaceAllMapped(RegExp(r'\\B(?=(\\d{3})+(?!\\d))'), (match) => '.')}";
   }
 }

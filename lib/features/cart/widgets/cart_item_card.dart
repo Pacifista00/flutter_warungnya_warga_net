@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/services/cart_service.dart';
+import '../models/cart_model.dart';
+import '../../../core/theme/app_colors.dart';
 
 class CartItemCard extends StatelessWidget {
-  const CartItemCard({super.key});
+  final CartItem item;
+  final VoidCallback onUpdate;
+
+  const CartItemCard({super.key, required this.item, required this.onUpdate});
 
   @override
   Widget build(BuildContext context) {
+    final CartService _cartService = CartService();
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -27,42 +33,62 @@ class CartItemCard extends StatelessWidget {
               color: Colors.grey.shade200,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.image, size: 32),
+            child: Image.network(item.imageUrl, fit: BoxFit.cover),
           ),
+
           const SizedBox(width: 12),
 
-          // INFO + QTY
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Nama Produk',
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                Text(
+                  item.product,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
+
                 const SizedBox(height: 4),
-                const Text(
-                  'Rp 125.000',
-                  style: TextStyle(
+
+                Text(
+                  'Rp ${item.price}',
+                  style: const TextStyle(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+
                 const SizedBox(height: 4),
 
-                // QTY CONTROL (di bawah harga)
                 Row(
                   children: [
                     InkWell(
-                      onTap: () {},
+                      onTap: () async {
+                        if (item.quantity <= 1) return;
+
+                        await _cartService.updateCartItem(
+                          cartItemId: item.id,
+                          quantity: item.quantity - 1,
+                        );
+
+                        onUpdate();
+                      },
                       child: const Icon(Icons.remove_circle_outline, size: 24),
                     ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4),
-                      child: Text('1'),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(item.quantity.toString()),
                     ),
+
                     InkWell(
-                      onTap: () {},
+                      onTap: () async {
+                        await _cartService.updateCartItem(
+                          cartItemId: item.id,
+                          quantity: item.quantity + 1,
+                        );
+
+                        onUpdate();
+                      },
                       child: const Icon(Icons.add_circle_outline, size: 24),
                     ),
                   ],
@@ -71,7 +97,6 @@ class CartItemCard extends StatelessWidget {
             ),
           ),
 
-          // DELETE BUTTON (kanan)
           IconButton(
             icon: const Icon(Icons.delete_outline),
             color: Colors.red,
@@ -90,9 +115,12 @@ class CartItemCard extends StatelessWidget {
                           child: const Text('Batal'),
                         ),
                         TextButton(
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.pop(context);
-                            // logic hapus
+
+                            await _cartService.deleteCartItem(item.id);
+
+                            onUpdate(); // refresh cart
                           },
                           child: const Text(
                             'Hapus',

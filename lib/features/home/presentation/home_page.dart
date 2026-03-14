@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_warungnya_warga_net/features/home/presentation/section/reward_point_section.dart';
+// import 'package:flutter_warungnya_warga_net/features/home/presentation/section/reward_point_section.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/electronic_product_section.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/food_product_section.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/home_header.dart';

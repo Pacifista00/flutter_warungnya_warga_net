@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:flutter_warungnya_warga_net/features/cart/models/shipping_model.dart';
 import 'package:flutter_warungnya_warga_net/features/cart/services/cart_service.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/widgets/midtrans_payment_page.dart';
 
 class CartFooter extends StatefulWidget {
   final int total;
@@ -34,7 +35,7 @@ class _CartFooterState extends State<CartFooter> {
     final CartService service = CartService();
 
     try {
-      await service.checkout(
+      final response = await service.checkout(
         courierCode: widget.shipping!.courierCode,
         courierServiceCode: widget.shipping!.courierServiceCode,
         shippingPrice: widget.shipping!.price,
@@ -42,22 +43,28 @@ class _CartFooterState extends State<CartFooter> {
         pointsUsed: widget.pointsUsed,
       );
 
+      final snapToken = response["snapToken"];
+      final orderId = response["order_id"];
+      final orderNumber = response["order_number"];
+
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
+      Navigator.push(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Checkout berhasil')));
-
-      // bisa redirect ke halaman order
+        MaterialPageRoute(
+          builder:
+              (_) => MidtransPaymentPage(
+                snapToken: snapToken,
+                orderId: orderId,
+                orderNumber: orderNumber,
+              ),
+        ),
+      );
     } catch (e) {
-      if (!mounted) return;
-
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Checkout gagal: $e')));
     }
-
-    if (!mounted) return;
 
     setState(() {
       loading = false;

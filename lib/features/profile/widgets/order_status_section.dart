@@ -23,7 +23,7 @@ class OrderStatusSection extends StatelessWidget {
                 child: _OrderItem(
                   icon: Icons.wallet_outlined,
                   label: 'Belum Bayar',
-                  status: OrderStatus.unpaid,
+                  status: OrderStatus.created,
                 ),
               ),
               Expanded(

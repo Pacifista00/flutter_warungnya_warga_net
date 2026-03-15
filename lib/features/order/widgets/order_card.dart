@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/features/order/models/order_model.dart';
 import 'package:go_router/go_router.dart';
-import '../models/order_model.dart';
-import 'status_badge.dart';
 
 class OrderCard extends StatelessWidget {
-  final Order order;
+  final OrderModel order;
 
   const OrderCard({super.key, required this.order});
 
@@ -19,25 +18,17 @@ class OrderCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// HEADER: KODE & STATUS
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    order.code,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
-                StatusBadge(status: order.status),
-              ],
+            /// HEADER: KODE ORDER
+            Text(
+              order.orderNumber,
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
 
             const SizedBox(height: 6),
 
-            /// TANGGAL
+            /// TANGGAL ORDER (langsung pakai string)
             Text(
-              _formatDate(order.date),
+              order.createdAtFormatted,
               style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
             ),
 
@@ -45,18 +36,21 @@ class OrderCard extends StatelessWidget {
 
             /// INFO ORDER
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
                 children: [
-                  _infoRow('Ekspedisi', order.expedition),
+                  _infoRow(
+                    'Ekspedisi',
+                    '${order.courier.code} - ${order.courier.service}',
+                  ),
                   const SizedBox(height: 8),
                   _infoRow(
                     'Total',
-                    'Rp ${_formatCurrency(order.total)}',
+                    'Rp ${_formatCurrency(order.totalAmount)}',
                     bold: true,
                   ),
                 ],
@@ -65,12 +59,12 @@ class OrderCard extends StatelessWidget {
 
             const SizedBox(height: 14),
 
-            /// BUTTON
+            /// BUTTON DETAIL
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () {
-                  context.push('/orders/detail/${order.code}');
+                  context.push('/orders/detail/${order.id}');
                 },
                 child: const Text('Lihat Detail'),
               ),
@@ -102,12 +96,6 @@ Widget _infoRow(String label, String value, {bool bold = false}) {
       ],
     ),
   );
-}
-
-String _formatDate(DateTime date) {
-  return '${date.day}/${date.month}/${date.year} '
-      '${date.hour.toString().padLeft(2, '0')}:'
-      '${date.minute.toString().padLeft(2, '0')}';
 }
 
 String _formatCurrency(int value) {

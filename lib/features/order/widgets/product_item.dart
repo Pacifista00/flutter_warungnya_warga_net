@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
 
 class ProductItem extends StatelessWidget {
-  const ProductItem({super.key});
+  final String name;
+  final String imageUrl;
+  final int quantity;
+  final int price;
+
+  const ProductItem({
+    super.key,
+    required this.name,
+    required this.imageUrl,
+    required this.quantity,
+    required this.price,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +32,11 @@ class ProductItem extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                'https://visits-humanitarian-significant-shanghai.trycloudflare.com/storage/products/doi7OSFres9HXG1QP1WBMf095tkdwSZy0ttI0uaO.webp', // ukuran gambar bebas
-                fit: BoxFit.cover, // ⬅️ WAJIB
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder:
+                    (context, error, stackTrace) =>
+                        Container(color: Colors.grey.shade300),
               ),
             ),
           ),
@@ -34,30 +48,31 @@ class ProductItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Floridina',
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
+                Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 4),
                 Text(
-                  'Floridina',
+                  'Qty: $quantity',
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
                 const SizedBox(height: 8),
 
-                /// ⬇️ FIX UTAMA DI SINI
+                /// ROW HARGA
                 Row(
-                  children: const [
+                  children: [
                     Expanded(
                       child: Text(
-                        '1 × Rp100.000',
+                        '$quantity × ${_formatCurrency(price)}',
                         overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade700,
+                        ),
                       ),
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text(
-                      'Rp100.000',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      _formatCurrency(price * quantity),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -67,5 +82,9 @@ class ProductItem extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formatCurrency(int value) {
+    return 'Rp${value.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => '.')}';
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:flutter_warungnya_warga_net/features/cart/services/order_service.dart';
+import 'package:flutter_warungnya_warga_net/features/order/services/order_service.dart';
 import 'package:flutter_warungnya_warga_net/features/payment/payment_success_page.dart';
 
 class MidtransPaymentPage extends StatefulWidget {
@@ -55,12 +55,14 @@ class _MidtransPaymentPageState extends State<MidtransPaymentPage> {
 
     if (!mounted) return;
 
-    final status = order["payment_status"];
+    final status = order.paymentStatus;
 
     if (status == "paid") {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const PaymentSuccessPage()),
+        MaterialPageRoute(
+          builder: (_) => PaymentSuccessPage(orderId: widget.orderId),
+        ),
       );
     } else if (status == "pending") {
       ScaffoldMessenger.of(context).showSnackBar(

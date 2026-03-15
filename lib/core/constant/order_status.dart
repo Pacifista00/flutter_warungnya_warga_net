@@ -1,1 +1,1 @@
-enum OrderStatus { unpaid, packed, shipped, completed }
+enum OrderStatus { created, packed, shipped, completed }

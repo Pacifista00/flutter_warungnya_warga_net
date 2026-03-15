@@ -9,7 +9,7 @@ class StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = switch (status) {
-      OrderStatus.unpaid => Colors.red,
+      OrderStatus.created => Colors.red,
       OrderStatus.packed => Colors.orange,
       OrderStatus.shipped => Colors.blue,
       OrderStatus.completed => Colors.green,

@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_warungnya_warga_net/widgets/format_date_time.dart';
+import 'package:flutter_warungnya_warga_net/widgets/order_status_helper.dart';
 import 'package:go_router/go_router.dart';
 import '../models/order_model.dart';
 import '../services/order_service.dart';
@@ -7,7 +12,6 @@ import '../widgets/info_box.dart';
 import '../widgets/key_value_row.dart';
 import '../widgets/product_item.dart';
 import '../widgets/section_header.dart';
-import '../widgets/status_badge_detail.dart';
 
 class OrderDetailPage extends StatefulWidget {
   final String orderCode;
@@ -19,6 +23,8 @@ class OrderDetailPage extends StatefulWidget {
 }
 
 class _OrderDetailPageState extends State<OrderDetailPage> {
+  Duration remainingTime = Duration.zero;
+  Timer? countdownTimer;
   late Future<OrderModel> futureOrder;
 
   @override
@@ -27,34 +33,43 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     futureOrder = OrderService().getOrder(widget.orderCode);
   }
 
+  @override
+  void dispose() {
+    countdownTimer?.cancel();
+    super.dispose();
+  }
+
+  void startCountdown(String expiredAt) {
+    final expiry = DateTime.parse(expiredAt).toLocal();
+
+    countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final diff = expiry.difference(DateTime.now());
+
+      if (diff.isNegative) {
+        timer.cancel();
+        setState(() {
+          remainingTime = Duration.zero;
+        });
+      } else {
+        setState(() {
+          remainingTime = diff;
+        });
+      }
+    });
+  }
+
+  String formatDuration(Duration d) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+
+    final hours = twoDigits(d.inHours);
+    final minutes = twoDigits(d.inMinutes.remainder(60));
+    final seconds = twoDigits(d.inSeconds.remainder(60));
+
+    return "$hours:$minutes:$seconds";
+  }
+
   String formatCurrency(int value) {
     return "Rp${value.toString()}";
-  }
-
-  String paymentMessage(String status) {
-    switch (status) {
-      case "paid":
-        return "Pembayaran telah diterima. Pesanan Anda sedang kami proses.";
-      case "pending":
-        return "Menunggu pembayaran Anda.";
-      case "expired":
-        return "Pembayaran telah kadaluarsa.";
-      default:
-        return "Status pembayaran tidak diketahui.";
-    }
-  }
-
-  Color paymentColor(String status) {
-    switch (status) {
-      case "paid":
-        return Colors.green;
-      case "pending":
-        return Colors.orange;
-      case "expired":
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
   }
 
   @override
@@ -92,6 +107,25 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           }
 
           final order = snapshot.data!;
+          if (order.expiredAt.isNotEmpty &&
+              order.paymentStatus == "unpaid" &&
+              countdownTimer == null) {
+            startCountdown(order.expiredAt);
+          }
+          String displayStatus;
+
+          if (order.paymentStatus == "expired" &&
+              order.expiredAt.isNotEmpty &&
+              DateTime.parse(
+                order.expiredAt,
+              ).toLocal().isBefore(DateTime.now())) {
+            displayStatus = "expired";
+          } else {
+            displayStatus =
+                order.shippingStatus.isNotEmpty
+                    ? order.shippingStatus
+                    : order.status;
+          }
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -113,32 +147,101 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 ),
 
                 const SizedBox(height: 16),
+                if (order.expiredAt.isNotEmpty &&
+                    order.paymentStatus == "unpaid") ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+                        Text(
+                          "Pesanan akan kedaluwarsa pada ${formatDateTime(order.expiredAt)}",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            const Text(
+                              "Sisa waktu pembayaran: ",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.red,
+                              ),
+                            ),
+                            Text(
+                              formatDuration(remainingTime),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                ],
 
                 /// INFO BOX
                 InfoBox(
                   icon: Icons.info,
-                  color: paymentColor(order.paymentStatus),
-                  text: paymentMessage(order.paymentStatus),
+                  color: OrderStatusHelper.color(displayStatus),
+                  text: OrderStatusHelper.message(displayStatus),
                 ),
-
-                const SizedBox(height: 20),
-
-                /// STATUS
-                const SectionHeader(title: 'Status Pesanan'),
-                const SizedBox(height: 8),
-                StatusBadgeDetail(text: order.paymentStatus),
 
                 const SizedBox(height: 24),
 
                 /// SHIPPING
-                const SectionHeader(
-                  title: 'Informasi Pengiriman',
-                  subtitle:
-                      'Detail metode pengiriman yang Anda pilih untuk pesanan ini.',
-                ),
+                const SectionHeader(title: 'Informasi Pengiriman'),
 
                 const SizedBox(height: 12),
 
+                if (order.trackingNumber.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Row(
+                      children: [
+                        const Text(
+                          'Resi',
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        ),
+
+                        const Spacer(),
+
+                        Text(order.trackingNumber),
+
+                        const SizedBox(width: 6),
+
+                        GestureDetector(
+                          onTap: () {
+                            Clipboard.setData(
+                              ClipboardData(text: order.trackingNumber),
+                            );
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Resi berhasil disalin"),
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                          },
+                          child: const Icon(Icons.copy, size: 14),
+                        ),
+                      ],
+                    ),
+                  ),
                 KeyValueRow(
                   label: 'Kurir',
                   value:
@@ -153,11 +256,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 const SizedBox(height: 24),
 
                 /// PRODUCT
-                const SectionHeader(
-                  title: 'Daftar Produk',
-                  subtitle:
-                      'Berikut adalah produk yang Anda pesan beserta jumlah dan harga.',
-                ),
+                const SectionHeader(title: 'Daftar Produk'),
 
                 const SizedBox(height: 12),
 
@@ -176,10 +275,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 const SizedBox(height: 24),
 
                 /// PAYMENT SUMMARY
-                const SectionHeader(
-                  title: 'Ringkasan Pembayaran',
-                  subtitle: 'Rincian total biaya yang perlu Anda bayarkan.',
-                ),
+                const SectionHeader(title: 'Ringkasan Pembayaran'),
 
                 const SizedBox(height: 12),
 
@@ -204,13 +300,37 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     label: 'Diskon Poin',
                     value: "- ${formatCurrency(order.pointsDiscount)}",
                   ),
+                if (order.pointsUsed > 0)
+                  KeyValueRow(
+                    label: 'Poin Digunakan',
+                    value: order.pointsUsed.toString(),
+                  ),
 
                 const Divider(height: 24),
 
-                KeyValueRow(
-                  label: 'Total Pembayaran',
-                  value: formatCurrency(order.totalAmount),
-                  bold: true,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Row(
+                    children: [
+                      const Text(
+                        'Total Pembayaran',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+
+                      const Spacer(),
+
+                      Text(
+                        formatCurrency(order.totalAmount),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: 32),

@@ -5,12 +5,16 @@ class OrderModel {
   final String shippingStatus; // baru
   final String paymentStatus;
   final String createdAtFormatted;
+  final String expiredAt;
+  final String trackingNumber;
+  final String paymentMethod;
 
   final int subtotal;
   final int shippingCost;
   final int voucherDiscount;
   final int pointsDiscount;
   final int totalAmount;
+  final int pointsUsed;
 
   final Courier courier;
   final List<OrderItem> items;
@@ -22,12 +26,16 @@ class OrderModel {
     required this.shippingStatus,
     required this.paymentStatus,
     required this.createdAtFormatted,
+    required this.expiredAt,
     required this.subtotal,
     required this.shippingCost,
     required this.voucherDiscount,
+    required this.pointsUsed,
     required this.pointsDiscount,
     required this.totalAmount,
+    required this.trackingNumber,
     required this.courier,
+    required this.paymentMethod,
     required this.items,
   });
 
@@ -39,11 +47,15 @@ class OrderModel {
       shippingStatus: json["shipping_status"] ?? '',
       paymentStatus: json["payment_status"] ?? '',
       createdAtFormatted: json["created_at_formatted"] ?? '',
+      expiredAt: json["expired_at"] ?? '',
       subtotal: json["subtotal_amount"] ?? 0,
       shippingCost: json["shipping_cost"] ?? 0,
       voucherDiscount: json["voucher_discount"] ?? 0,
+      pointsUsed: json["points_used"] ?? 0,
       pointsDiscount: json["points_discount"] ?? 0,
       totalAmount: json["total_amount"] ?? 0,
+      trackingNumber: json["tracking_number"] ?? '',
+      paymentMethod: json["payment_method"] ?? '',
       courier:
           json["courier"] != null
               ? Courier.fromJson(json["courier"])
@@ -63,7 +75,7 @@ class Courier {
   Courier({required this.code, required this.service});
 
   factory Courier.fromJson(Map<String, dynamic> json) {
-    return Courier(code: json["code"], service: json["service"]);
+    return Courier(code: json["code"] ?? '', service: json["service"] ?? '');
   }
 }
 

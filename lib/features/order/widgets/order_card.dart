@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:flutter_warungnya_warga_net/features/order/models/order_model.dart';
+import 'package:flutter_warungnya_warga_net/widgets/order_status_badge.dart';
 import 'package:go_router/go_router.dart';
 
 class OrderCard extends StatelessWidget {
@@ -9,6 +11,10 @@ class OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final firstItem = order.items.isNotEmpty ? order.items.first : null;
+    final displayStatus =
+        (order.shippingStatus.isNotEmpty) ? order.shippingStatus : order.status;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 1,
@@ -18,15 +24,30 @@ class OrderCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// HEADER: KODE ORDER
-            Text(
-              order.orderNumber,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+            /// ORDER ID
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    order.orderNumber,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+
+                const SizedBox(width: 8),
+
+                OrderStatusBadge(status: displayStatus),
+              ],
             ),
 
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
 
-            /// TANGGAL ORDER (langsung pakai string)
+            /// TANGGAL
             Text(
               order.createdAtFormatted,
               style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
@@ -34,68 +55,109 @@ class OrderCard extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            /// INFO ORDER
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
+            /// PRODUK PERTAMA
+            if (firstItem != null)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _infoRow(
-                    'Ekspedisi',
-                    '${order.courier.code} - ${order.courier.service}',
+                  /// GAMBAR
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      firstItem.imageUrl,
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.image_not_supported,
+                            size: 20,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  _infoRow(
-                    'Total',
-                    'Rp ${_formatCurrency(order.totalAmount)}',
-                    bold: true,
+
+                  const SizedBox(width: 10),
+
+                  /// INFO PRODUK
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          firstItem.productName,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+
+                        const SizedBox(height: 4),
+
+                        Text(
+                          '${firstItem.quantity} x Rp ${_formatCurrency(firstItem.unitPrice)}',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
 
             const SizedBox(height: 14),
 
-            /// BUTTON DETAIL
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {
-                  context.push('/orders/detail/${order.id}');
-                },
-                child: const Text('Lihat Detail'),
-              ),
+            /// TOTAL + BUTTON
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Total'),
+                    Text(
+                      'Rp ${_formatCurrency(order.totalAmount)}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+
+                IntrinsicWidth(
+                  child: SizedBox(
+                    height: 36,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        context.push('/orders/detail/${order.id}');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text('Lihat Detail'),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
-}
-
-Widget _infoRow(String label, String value, {bool bold = false}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 4),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontWeight: bold ? FontWeight.w600 : FontWeight.normal,
-            fontSize: 13,
-          ),
-        ),
-      ],
-    ),
-  );
 }
 
 String _formatCurrency(int value) {

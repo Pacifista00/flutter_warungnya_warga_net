@@ -84,4 +84,10 @@ class CartService {
       }
     }
   }
+
+  Future<bool> checkUserHasAddress() async {
+    final response = await _dio.get('/addresses');
+    final List data = response.data;
+    return data.isNotEmpty;
+  }
 }

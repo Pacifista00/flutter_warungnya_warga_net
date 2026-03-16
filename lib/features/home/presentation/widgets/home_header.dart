@@ -15,7 +15,7 @@ class HeaderSection extends ConsumerWidget {
     final user = authState.user;
     final points =
         authState.status == AuthStatus.authenticated && user != null
-            ? user['point']['total_points'] ?? 0
+            ? (user['point']?['total_points'] ?? 0)
             : 0;
 
     return Container(

@@ -1,4 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_warungnya_warga_net/features/address/models/address_model.dart';
+import 'package:flutter_warungnya_warga_net/features/address/presentation/address_form_page.dart';
+import 'package:flutter_warungnya_warga_net/features/address/presentation/address_list_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_warungnya_warga_net/core/constant/order_status.dart';
 import 'package:flutter_warungnya_warga_net/features/auth/presentation/register.dart';
@@ -77,6 +80,25 @@ final routerProvider = Provider<GoRouter>((ref) {
           final statusParam = state.pathParameters['status']!;
           final status = OrderStatus.values.byName(statusParam);
           return OrderListPage(status: status);
+        },
+      ),
+
+      GoRoute(
+        path: '/addresses',
+        name: 'address-list',
+        builder: (_, __) => const AddressListPage(),
+      ),
+
+      GoRoute(
+        path: '/addresses/create',
+        builder: (context, state) => const AddressFormPage(),
+      ),
+
+      GoRoute(
+        path: '/addresses/edit',
+        builder: (context, state) {
+          final address = state.extra as AddressModel;
+          return AddressFormPage(address: address);
         },
       ),
 

@@ -68,6 +68,14 @@ class ProfilePage extends ConsumerWidget {
                   subtitle:
                       'Ubah Kata Sandi, Tambah Alamat, Logout, dan lainnya',
                 ),
+                SettingItem(
+                  icon: Icons.location_on_outlined,
+                  title: 'Alamat',
+                  subtitle: 'Kelola alamat anda untuk pengiriman',
+                  onTap: () {
+                    context.go('/addresses');
+                  },
+                ),
                 const SettingItem(
                   icon: Icons.help_outline,
                   title: 'Pusat Bantuan',

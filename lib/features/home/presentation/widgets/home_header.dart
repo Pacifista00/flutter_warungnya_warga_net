@@ -68,7 +68,7 @@ class HeaderSection extends ConsumerWidget {
                   )
                   : InkWell(
                     onTap: () {
-                      context.go('/login');
+                      context.push('/login');
                     },
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,

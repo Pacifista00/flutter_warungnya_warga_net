@@ -77,7 +77,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             'Akun berhasil dibuat.\nSilakan login dan verifikasi akun anda',
         onPressed: () {
           Navigator.of(context).pop();
-          context.go(
+          context.push(
             '/verify-email',
             extra: email, // email user
           );
@@ -201,7 +201,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                 recognizer:
                                     TapGestureRecognizer()
                                       ..onTap = () {
-                                        context.go('/login');
+                                        context.push('/login');
                                       },
                               ),
                             ],

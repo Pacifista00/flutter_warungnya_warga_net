@@ -40,16 +40,16 @@ class BottomNav extends StatelessWidget {
           onTap: (index) {
             switch (index) {
               case 0:
-                context.go('/home');
+                context.push('/home');
                 break;
               case 1:
-                context.go('/produk');
+                context.push('/produk');
                 break;
               case 2:
-                context.go('/voucher');
+                context.push('/voucher');
                 break;
               case 3:
-                context.go('/profile');
+                context.push('/profile');
                 break;
             }
           },

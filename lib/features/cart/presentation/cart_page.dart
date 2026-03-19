@@ -1,30 +1,31 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
+import 'package:flutter_warungnya_warga_net/features/auth/auth_provider.dart';
+import 'package:flutter_warungnya_warga_net/features/auth/domain/auth_state.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/widgets/point_section.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/widgets/order_summary.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/widgets/cart_item_card.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/widgets/footer_checkout.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/widgets/empty_cart.dart';
 import 'package:flutter_warungnya_warga_net/features/cart/services/cart_service.dart';
 import 'package:flutter_warungnya_warga_net/features/address/services/address_service.dart';
-
-import 'package:flutter_warungnya_warga_net/features/cart/widgets/cart_item_card.dart';
-import 'package:flutter_warungnya_warga_net/features/cart/widgets/empty_cart.dart';
-import 'package:flutter_warungnya_warga_net/features/cart/widgets/footer_checkout.dart';
-import 'package:flutter_warungnya_warga_net/features/cart/widgets/order_summary.dart';
-
 import 'package:flutter_warungnya_warga_net/features/cart/models/cart_model.dart';
 import 'package:flutter_warungnya_warga_net/features/cart/models/shipping_model.dart';
 import 'package:flutter_warungnya_warga_net/features/address/models/address_model.dart';
+import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 
-class CartPage extends StatefulWidget {
+class CartPage extends ConsumerStatefulWidget {
   const CartPage({super.key});
 
   @override
-  State<CartPage> createState() => _CartPageState();
+  ConsumerState<CartPage> createState() => _CartPageState();
 }
 
-class _CartPageState extends State<CartPage> {
-  late Future<CartModel> cartFuture;
-  late Future<Map<String, bool>> addressStatusFuture;
-
+class _CartPageState extends ConsumerState<CartPage> {
+  late Future<List<dynamic>> _combinedDataFuture;
   final CartService _cartService = CartService();
   final AddressService _addressService = AddressService();
 
@@ -33,47 +34,61 @@ class _CartPageState extends State<CartPage> {
   String? voucherCode;
   ShippingModel? selectedShipping;
 
+  final ValueNotifier<int> pointsUsedNotifier = ValueNotifier<int>(0);
+
   @override
   void initState() {
     super.initState();
-    cartFuture = _cartService.getCart();
-    addressStatusFuture = checkUserAddressStatus();
+    _initData();
   }
 
-  /// cek status alamat user
-  Future<Map<String, bool>> checkUserAddressStatus() async {
+  void _initData() {
+    _combinedDataFuture = Future.wait([
+      _cartService.getCart(),
+      _checkUserAddressStatus(),
+    ]);
+  }
+
+  Future<Map<String, bool>> _checkUserAddressStatus() async {
     final List<AddressModel> addresses = await _addressService.getAddresses();
-
-    if (addresses.isEmpty) {
-      return {"hasAddress": false, "hasDefault": false};
-    }
-
+    if (addresses.isEmpty) return {"hasAddress": false, "hasDefault": false};
     final hasDefault = addresses.any((a) => a.isDefault == true);
-
     return {"hasAddress": true, "hasDefault": hasDefault};
   }
 
   void refreshCart() {
     setState(() {
-      cartFuture = _cartService.getCart();
+      _initData();
     });
   }
 
   @override
+  void dispose() {
+    pointsUsedNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+    final userPoints =
+        authState.status == AuthStatus.authenticated && user != null
+            ? (user['point']?['total_points'] ?? 0)
+            : 0;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Keranjang'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
-      body: FutureBuilder(
-        future: Future.wait([cartFuture, addressStatusFuture]),
+      body: FutureBuilder<List<dynamic>>(
+        future: _combinedDataFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-
           if (snapshot.hasError) {
             return const Center(child: Text('Gagal memuat data'));
           }
@@ -81,94 +96,17 @@ class _CartPageState extends State<CartPage> {
           final cart = snapshot.data![0] as CartModel;
           final addressStatus = snapshot.data![1] as Map<String, bool>;
 
-          final hasAddress = addressStatus["hasAddress"]!;
-          final hasDefault = addressStatus["hasDefault"]!;
-
-          /// =============================
-          /// CASE 1 - BELUM ADA ALAMAT
-          /// =============================
-          if (!hasAddress) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.location_off_outlined,
-                      size: 64,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      "Alamat belum ditambahkan. Silakan tambahkan alamat terlebih dahulu.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.push('/addresses');
-                      },
-                      child: const Text("Atur alamat pengiriman"),
-                    ),
-                  ],
-                ),
-              ),
-            );
+          if (!addressStatus["hasAddress"]! || !addressStatus["hasDefault"]!) {
+            return _buildAddressError(addressStatus["hasAddress"]!);
           }
 
-          /// =====================================
-          /// CASE 2 - ADA ALAMAT TAPI BELUM DEFAULT
-          /// =====================================
-          if (!hasDefault) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.location_on_outlined,
-                      size: 64,
-                      color: Colors.orange,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      "Alamat utama belum ditentukan. Silakan pilih salah satu alamat sebagai alamat utama.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.push('/addresses');
-                      },
-                      child: const Text("Atur alamat pengiriman"),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-
-          /// =============================
-          /// CASE 3 - KERANJANG KOSONG
-          /// =============================
-          if (cart.items.isEmpty) {
-            return const EmptyCartWidget();
-          }
+          if (cart.items.isEmpty) return const EmptyCartWidget();
 
           final subtotal = cart.items.fold(
             0,
             (sum, item) => sum + (item.price * item.quantity),
           );
 
-          final total = subtotal + shippingCost - discount;
-
-          /// =============================
-          /// CART NORMAL
-          /// =============================
           return Column(
             children: [
               Expanded(
@@ -179,35 +117,109 @@ class _CartPageState extends State<CartPage> {
                       (item) => CartItemCard(item: item, onUpdate: refreshCart),
                     ),
 
-                    OrderSummaryCard(
-                      cartItems: cart.items,
-                      shippingCost: shippingCost,
-                      discount: discount,
-                      onShippingChanged: (shipping) {
-                        setState(() {
-                          selectedShipping = shipping;
-                          shippingCost = shipping.price;
-                        });
+                    ValueListenableBuilder<int>(
+                      valueListenable: pointsUsedNotifier,
+                      builder: (_, pointsUsed, __) {
+                        final pointsDiscount = min(pointsUsed * 5000, subtotal);
+
+                        return OrderSummaryCard(
+                          cartItems: cart.items,
+                          shippingCost: shippingCost,
+                          discount: discount,
+                          pointsDiscount: pointsDiscount,
+                          onShippingChanged: (shipping) {
+                            setState(() {
+                              selectedShipping = shipping;
+                              shippingCost = shipping.price;
+                            });
+                          },
+                          onVoucherApplied: (disc, code) {
+                            setState(() {
+                              discount = disc;
+                              voucherCode = code;
+
+                              // 🔥 RESET POINTS kalau voucher berubah
+                              pointsUsedNotifier.value = 0;
+                            });
+                          },
+                        );
                       },
-                      onVoucherApplied: (disc, code) {
-                        setState(() {
-                          discount = disc;
-                          voucherCode = code;
-                        });
+                    ),
+
+                    /// ✅ FIX: pakai subtotal setelah voucher
+                    Builder(
+                      builder: (_) {
+                        final subtotalAfterVoucher = max(
+                          0,
+                          subtotal - discount,
+                        );
+
+                        return PointsSection(
+                          userPoints: userPoints,
+                          subtotal: subtotalAfterVoucher,
+                          valueNotifier: pointsUsedNotifier,
+                        );
                       },
                     ),
                   ],
                 ),
               ),
 
-              CartFooter(
-                total: total,
-                shipping: selectedShipping,
-                voucherCode: voucherCode,
+              /// FOOTER
+              ValueListenableBuilder<int>(
+                valueListenable: pointsUsedNotifier,
+                builder: (_, pointsUsed, __) {
+                  final pointsValue = pointsUsed * 5000;
+
+                  /// ✅ URUTAN BENAR
+                  final afterVoucher = max(0, subtotal - discount);
+                  final afterPoints = max(0, afterVoucher - pointsValue);
+
+                  final totalFinal = afterPoints + shippingCost;
+
+                  return CartFooter(
+                    total: totalFinal,
+                    shipping: selectedShipping,
+                    voucherCode: voucherCode,
+                    pointsUsed: pointsUsed,
+                    pointValue: 5000,
+                  );
+                },
               ),
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildAddressError(bool hasAddress) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              hasAddress
+                  ? Icons.location_on_outlined
+                  : Icons.location_off_outlined,
+              size: 64,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              hasAddress
+                  ? "Alamat utama belum ditentukan"
+                  : "Alamat belum ditambahkan",
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => context.push('/addresses'),
+              child: const Text("Atur alamat"),
+            ),
+          ],
+        ),
       ),
     );
   }

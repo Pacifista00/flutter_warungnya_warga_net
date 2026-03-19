@@ -63,7 +63,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           .login(email: email, password: password);
 
       if (!mounted) return;
-      context.go(_from);
+      context.push(_from);
     } catch (e) {
       if (!mounted) return;
 
@@ -72,7 +72,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       await AppDialog.show(context, title: 'Error', message: message);
 
       if (e is EmailNotVerifiedException) {
-        context.go('/verify-email', extra: e.email);
+        context.push('/verify-email', extra: e.email);
         return;
       }
 
@@ -98,7 +98,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           (route) => _from.startsWith(route),
         );
 
-        context.go(isFromProtected ? '/home' : _from);
+        context.push(isFromProtected ? '/home' : _from);
       },
       child: Scaffold(
         backgroundColor: Colors.grey.shade100,
@@ -220,7 +220,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                     recognizer:
                                         TapGestureRecognizer()
                                           ..onTap = () {
-                                            context.go('/register?from=$_from');
+                                            context.push(
+                                              '/register?from=$_from',
+                                            );
                                           },
                                   ),
                                 ],

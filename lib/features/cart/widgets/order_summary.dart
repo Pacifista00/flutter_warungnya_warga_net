@@ -1,14 +1,16 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_warungnya_warga_net/features/cart/models/cart_model.dart';
-import 'package:flutter_warungnya_warga_net/features/cart/models/shipping_model.dart';
-import 'package:flutter_warungnya_warga_net/features/cart/widgets/shipping_dropdown.dart';
-import 'package:flutter_warungnya_warga_net/features/cart/widgets/voucher_form.dart';
+import '../models/cart_model.dart';
+import '../models/shipping_model.dart';
+import 'shipping_dropdown.dart';
+import 'voucher_form.dart';
 
 class OrderSummaryCard extends StatelessWidget {
   final List<CartItem> cartItems;
   final int shippingCost;
   final int discount;
-
+  final int pointsDiscount;
   final Function(ShippingModel) onShippingChanged;
   final Function(int, String?) onVoucherApplied;
 
@@ -17,16 +19,17 @@ class OrderSummaryCard extends StatelessWidget {
     required this.cartItems,
     required this.shippingCost,
     required this.discount,
+    required this.pointsDiscount,
     required this.onShippingChanged,
     required this.onVoucherApplied,
   });
 
-  int get subtotal {
-    return cartItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
-  }
+  int get subtotal =>
+      cartItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
 
   @override
   Widget build(BuildContext context) {
+    final afterVoucher = max(0, subtotal - discount);
     return Container(
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.all(16),
@@ -45,22 +48,26 @@ class OrderSummaryCard extends StatelessWidget {
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
-
-          _summaryRow('Sub Total', _format(subtotal)),
+          _summaryRow('Subtotal Produk', _format(subtotal)),
+          if (pointsDiscount > 0)
+            _summaryRow(
+              'Potongan Poin',
+              "- ${_format(pointsDiscount)}",
+              valueColor: Colors.green,
+            ),
+          if (discount > 0)
+            _summaryRow(
+              'Diskon Voucher',
+              "- ${_format(discount)}",
+              valueColor: Colors.green,
+            ),
+          if (discount > 0)
+            _summaryRow('Subtotal Setelah Voucher', _format(afterVoucher)),
           _summaryRow('Biaya Pengiriman', _format(shippingCost)),
-          _summaryRow('Diskon', "- ${_format(discount)}"),
-
           const Divider(height: 24),
-
           ShippingDropdown(onChanged: onShippingChanged),
-
           const SizedBox(height: 16),
-
           VoucherForm(onApplied: onVoucherApplied),
-
-          // const SizedBox(height: 16),
-
-          // _summaryRow('Total', _format(total), valueColor: Colors.green),
         ],
       ),
     );
@@ -86,7 +93,6 @@ class OrderSummaryCard extends StatelessWidget {
     );
   }
 
-  String _format(int value) {
-    return "Rp ${value.toString().replaceAllMapped(RegExp(r'\\B(?=(\\d{3})+(?!\\d))'), (match) => '.')}";
-  }
+  String _format(int value) =>
+      "Rp ${value.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => '.')}";
 }

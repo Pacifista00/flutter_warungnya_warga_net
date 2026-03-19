@@ -5,10 +5,11 @@ import 'package:flutter_warungnya_warga_net/features/cart/services/cart_service.
 import 'package:flutter_warungnya_warga_net/features/cart/widgets/midtrans_payment_page.dart';
 
 class CartFooter extends StatefulWidget {
-  final int total;
+  final int total; // Ini sudah total bersih (Produk - Diskon + Ongkir)
   final ShippingModel? shipping;
   final String? voucherCode;
   final int pointsUsed;
+  final int pointValue;
 
   const CartFooter({
     super.key,
@@ -16,6 +17,7 @@ class CartFooter extends StatefulWidget {
     this.shipping,
     this.voucherCode,
     this.pointsUsed = 0,
+    this.pointValue = 5000,
   });
 
   @override
@@ -25,55 +27,8 @@ class CartFooter extends StatefulWidget {
 class _CartFooterState extends State<CartFooter> {
   bool loading = false;
 
-  Future<void> checkout() async {
-    if (widget.shipping == null) return;
-
-    setState(() {
-      loading = true;
-    });
-
-    final CartService service = CartService();
-
-    try {
-      final response = await service.checkout(
-        courierCode: widget.shipping!.courierCode,
-        courierServiceCode: widget.shipping!.courierServiceCode,
-        shippingPrice: widget.shipping!.price,
-        voucherCode: widget.voucherCode,
-        pointsUsed: widget.pointsUsed,
-      );
-
-      final snapToken = response["snapToken"];
-      final orderId = response["order_id"];
-      final orderNumber = response["order_number"];
-
-      if (!mounted) return;
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder:
-              (_) => MidtransPaymentPage(
-                snapToken: snapToken,
-                orderId: orderId,
-                orderNumber: orderNumber,
-              ),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Checkout gagal: $e')));
-    }
-
-    setState(() {
-      loading = false;
-    });
-  }
-
-  String format(int value) {
-    return "Rp ${value.toString().replaceAllMapped(RegExp(r'\\B(?=(\\d{3})+(?!\\d))'), (match) => '.')}";
-  }
+  String _format(int value) =>
+      "Rp ${value.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => '.')}";
 
   @override
   Widget build(BuildContext context) {
@@ -96,12 +51,15 @@ class _CartFooterState extends State<CartFooter> {
           children: [
             Expanded(
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Total', style: TextStyle(color: Colors.grey)),
-                  const SizedBox(height: 4),
+                  const Text(
+                    'Total Bayar',
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
                   Text(
-                    format(widget.total),
+                    _format(widget.total),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -118,7 +76,7 @@ class _CartFooterState extends State<CartFooter> {
                   backgroundColor: disabled ? Colors.grey : AppColors.primary,
                   foregroundColor: Colors.white,
                 ),
-                onPressed: disabled ? null : checkout,
+                onPressed: disabled ? null : () => _handleCheckout(),
                 child:
                     loading
                         ? const SizedBox(
@@ -136,5 +94,37 @@ class _CartFooterState extends State<CartFooter> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleCheckout() async {
+    setState(() => loading = true);
+    try {
+      final response = await CartService().checkout(
+        courierCode: widget.shipping!.courierCode,
+        courierServiceCode: widget.shipping!.courierServiceCode,
+        shippingPrice: widget.shipping!.price,
+        voucherCode: widget.voucherCode,
+        pointsUsed: widget.pointsUsed,
+      );
+
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (_) => MidtransPaymentPage(
+                snapToken: response["snapToken"],
+                orderId: response["order_id"],
+                orderNumber: response["order_number"],
+              ),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Checkout gagal: $e')));
+    } finally {
+      if (mounted) setState(() => loading = false);
+    }
   }
 }

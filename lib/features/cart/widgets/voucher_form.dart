@@ -3,7 +3,7 @@ import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:flutter_warungnya_warga_net/features/cart/services/voucher_services.dart';
 
 class VoucherForm extends StatefulWidget {
-  final void Function(int discount, String code)? onApplied;
+  final void Function(int discount, String? code)? onApplied;
 
   const VoucherForm({super.key, this.onApplied});
 
@@ -53,6 +53,18 @@ class _VoucherFormState extends State<VoucherForm> {
     setState(() {
       loading = false;
     });
+  }
+
+  void removeVoucher() {
+    setState(() {
+      voucher = null;
+      discount = 0;
+      controller.clear();
+      message = null;
+      success = false;
+    });
+
+    widget.onApplied?.call(0, null); // 🔥 kirim reset ke parent
   }
 
   @override
@@ -125,39 +137,45 @@ class _VoucherFormState extends State<VoucherForm> {
               border: Border.all(color: Colors.green.shade200),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Info voucher
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      voucher!['name'], // Nama voucher
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      "Kode: ${voucher!['code']}", // Kode voucher
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    Text(
-                      voucher!['type'] == 'percentage'
-                          ? "Potongan: ${voucher!['value']}%" // type percentage
-                          : "Potongan: ${_format(voucher!['value'])}", // type fixed
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.black87,
+                /// 🔹 INFO VOUCHER
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        voucher!['name'],
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                    ),
-                  ],
+                      Text(
+                        "Kode: ${voucher!['code']}",
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      Text(
+                        voucher!['type'] == 'percentage'
+                            ? "Potongan: ${voucher!['value']}%"
+                            : "Potongan: ${_format(voucher!['value'])}",
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
                 ),
 
-                // Diskon yang diterapkan
+                /// 🔹 DISKON
                 Text(
                   "- ${_format(discount)}",
                   style: const TextStyle(
                     color: Colors.green,
                     fontWeight: FontWeight.bold,
                   ),
+                ),
+
+                const SizedBox(width: 8),
+
+                /// 🔥 TOMBOL X (REMOVE)
+                InkWell(
+                  onTap: removeVoucher,
+                  child: const Icon(Icons.close, size: 18, color: Colors.red),
                 ),
               ],
             ),

@@ -73,7 +73,7 @@ class ProfilePage extends ConsumerWidget {
                   title: 'Alamat',
                   subtitle: 'Kelola alamat anda untuk pengiriman',
                   onTap: () {
-                    context.go('/addresses');
+                    context.push('/addresses');
                   },
                 ),
                 const SettingItem(
@@ -104,7 +104,7 @@ class ProfilePage extends ConsumerWidget {
                       await ref.read(authControllerProvider).logout();
 
                       if (context.mounted) {
-                        context.go('/login');
+                        context.push('/login');
                       }
                     }
                   },

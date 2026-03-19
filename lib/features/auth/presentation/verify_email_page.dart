@@ -65,7 +65,7 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
             ),
       );
 
-      context.go('/login');
+      context.push('/login');
     } on AuthException catch (e) {
       if (!mounted) return;
 
@@ -241,7 +241,7 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
               const SizedBox(height: 8),
 
               TextButton(
-                onPressed: () => context.go('/login'),
+                onPressed: () => context.pushReplacement('/login'),
                 child: const Text('Kembali ke Login'),
               ),
             ],

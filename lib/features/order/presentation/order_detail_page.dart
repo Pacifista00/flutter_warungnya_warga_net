@@ -27,6 +27,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   Duration remainingTime = Duration.zero;
   Timer? countdownTimer;
   late Future<OrderModel> futureOrder;
+  bool cancelLoading = false;
 
   @override
   void initState() {
@@ -92,6 +93,66 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     }
   }
 
+  Future<void> _handleCancelOrder(OrderModel order) async {
+    setState(() => cancelLoading = true);
+
+    try {
+      await OrderService().cancelOrder(order.id.toString());
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Pesanan berhasil dibatalkan")),
+      );
+
+      // refresh data
+      setState(() {
+        futureOrder = OrderService().getOrder(widget.orderCode);
+        countdownTimer?.cancel();
+        countdownTimer = null;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Gagal membatalkan pesanan: $e")));
+    } finally {
+      if (mounted) {
+        setState(() => cancelLoading = false);
+      }
+    }
+  }
+
+  Future<void> _confirmCancel(OrderModel order) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Batalkan Pesanan"),
+          content: const Text(
+            "Yakin ingin membatalkan pesanan ini?\nTindakan ini tidak bisa dibatalkan.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text("Tidak"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text(
+                "Ya, Batalkan",
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      _handleCancelOrder(order);
+    }
+  }
+
   String formatDuration(Duration d) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
 
@@ -104,6 +165,57 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
   String formatCurrency(int value) {
     return "Rp${value.toString()}";
+  }
+
+  Widget _paymentStamp(String status) {
+    String text;
+    Color color;
+
+    switch (status) {
+      case "paid":
+        text = "LUNAS";
+        color = Colors.green;
+        break;
+      case "pending":
+        text = "PENDING";
+        color = Colors.orange;
+        break;
+      case "unpaid":
+        text = "BELUM BAYAR";
+        color = Colors.red;
+        break;
+      case "expired":
+        text = "KADALUARSA";
+        color = Colors.grey;
+        break;
+      default:
+        text = status.toUpperCase();
+        color = Colors.blueGrey;
+    }
+
+    return IgnorePointer(
+      child: Opacity(
+        opacity: 0.15, // transparan
+        child: Transform.rotate(
+          angle: -0.3, // miring
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: color, width: 3),
+            ),
+            child: Text(
+              text,
+              style: TextStyle(
+                color: color,
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -141,6 +253,15 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           }
 
           final order = snapshot.data!;
+          bool canCancel =
+              ["created", "pending", "processing"].contains(order.status) &&
+              [
+                "unpaid",
+                "pending",
+                "paid",
+                "expired",
+              ].contains(order.paymentStatus) &&
+              order.shippingStatus.isEmpty;
           if (order.expiredAt.isNotEmpty &&
               order.paymentStatus == "unpaid" &&
               countdownTimer == null) {
@@ -309,63 +430,91 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 const SizedBox(height: 24),
 
                 /// PAYMENT SUMMARY
-                const SectionHeader(title: 'Ringkasan Pembayaran'),
+                Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SectionHeader(title: 'Ringkasan Pembayaran'),
+                        const SizedBox(height: 12),
 
-                const SizedBox(height: 12),
-
-                KeyValueRow(
-                  label: 'Subtotal Produk',
-                  value: formatCurrency(order.subtotal),
-                ),
-
-                KeyValueRow(
-                  label: 'Ongkos Kirim',
-                  value: formatCurrency(order.shippingCost),
-                ),
-
-                if (order.voucherDiscount > 0)
-                  KeyValueRow(
-                    label: 'Diskon Voucher',
-                    value: "- ${formatCurrency(order.voucherDiscount)}",
-                  ),
-
-                if (order.pointsDiscount > 0)
-                  KeyValueRow(
-                    label: 'Diskon Poin',
-                    value: "- ${formatCurrency(order.pointsDiscount)}",
-                  ),
-                if (order.pointsUsed > 0)
-                  KeyValueRow(
-                    label: 'Poin Digunakan',
-                    value: order.pointsUsed.toString(),
-                  ),
-
-                const Divider(height: 24),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Row(
-                    children: [
-                      const Text(
-                        'Total Pembayaran',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                        KeyValueRow(
+                          label: 'Subtotal Produk',
+                          value: formatCurrency(order.subtotal),
                         ),
-                      ),
 
-                      const Spacer(),
-
-                      Text(
-                        formatCurrency(order.totalAmount),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                        KeyValueRow(
+                          label: 'Ongkos Kirim',
+                          value: formatCurrency(order.shippingCost),
                         ),
+
+                        if (order.voucherDiscount > 0)
+                          KeyValueRow(
+                            label: 'Diskon Voucher',
+                            value: "- ${formatCurrency(order.voucherDiscount)}",
+                          ),
+
+                        if (order.pointsDiscount > 0)
+                          KeyValueRow(
+                            label: 'Diskon Poin',
+                            value: "- ${formatCurrency(order.pointsDiscount)}",
+                          ),
+
+                        const Divider(height: 16),
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Row(
+                            children: [
+                              const Text(
+                                'Total Pembayaran',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const Spacer(),
+                              Text(
+                                formatCurrency(order.totalAmount),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    /// STAMP OVERLAY
+                    Positioned.fill(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: _paymentStamp(order.paymentStatus),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+                if (canCancel) ...[
+                  const SizedBox(height: 12),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed:
+                          cancelLoading ? null : () => _confirmCancel(order),
+                      child: Text(
+                        cancelLoading ? "Membatalkan..." : "Batalkan Pesanan",
+                      ),
+                    ),
+                  ),
+                ],
                 if ((order.paymentStatus == "unpaid" ||
                         order.paymentStatus == "pending") &&
                     displayStatus != "expired") ...[

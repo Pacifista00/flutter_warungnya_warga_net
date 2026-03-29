@@ -31,4 +31,17 @@ class OrderService {
 
     return data; // kalau langsung
   }
+
+  Future<void> cancelOrder(String orderId) async {
+    final response = await _dio.post('/order/$orderId/cancel');
+
+    final data = response.data;
+
+    // Optional: validasi response dari backend
+    if (data is Map && data.containsKey('success')) {
+      if (data['success'] != true) {
+        throw Exception(data['message'] ?? 'Gagal membatalkan pesanan');
+      }
+    }
+  }
 }

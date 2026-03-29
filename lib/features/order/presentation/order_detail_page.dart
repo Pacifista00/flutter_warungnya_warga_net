@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/widgets/midtrans_payment_page.dart';
 import 'package:flutter_warungnya_warga_net/widgets/format_date_time.dart';
 import 'package:flutter_warungnya_warga_net/widgets/order_status_helper.dart';
 import 'package:go_router/go_router.dart';
@@ -56,6 +57,39 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         });
       }
     });
+  }
+
+  Future<void> _handlePayNow(OrderModel order) async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
+      );
+
+      final response = await OrderService().retryPayment(order.id.toString());
+
+      if (!mounted) return;
+      Navigator.pop(context); // tutup loading
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (_) => MidtransPaymentPage(
+                snapToken: response["snapToken"],
+                orderId: order.id, // dari object
+                orderNumber: order.orderNumber, // dari object
+              ),
+        ),
+      );
+    } catch (e) {
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Gagal membuka pembayaran: $e")));
+    }
   }
 
   String formatDuration(Duration d) {
@@ -332,16 +366,25 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     ],
                   ),
                 ),
+                if ((order.paymentStatus == "unpaid" ||
+                        order.paymentStatus == "pending") &&
+                    displayStatus != "expired") ...[
+                  const SizedBox(height: 16),
 
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () => _handlePayNow(order),
+                      child: const Text("Bayar Sekarang"),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 32),
-
-                /// BUTTON BACK
-                // Center(
-                //   child: OutlinedButton(
-                //     onPressed: () => context.go("/"),
-                //     child: const Text('Kembali'),
-                //   ),
-                // ),
               ],
             ),
           );

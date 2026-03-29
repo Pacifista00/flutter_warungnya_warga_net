@@ -58,7 +58,7 @@ class OrderSummaryCard extends StatelessWidget {
           if (discount > 0)
             _summaryRow(
               'Diskon Voucher',
-              "- ${_format(discount)}",
+              "- ${_format(min(discount, subtotal))}",
               valueColor: Colors.green,
             ),
           if (discount > 0)

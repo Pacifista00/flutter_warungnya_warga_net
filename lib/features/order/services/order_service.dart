@@ -19,4 +19,16 @@ class OrderService {
     final List data = res.data['data']; // data adalah List
     return data.map((e) => OrderModel.fromJson(e)).toList();
   }
+
+  Future<Map<String, dynamic>> retryPayment(String orderCode) async {
+    final response = await _dio.post('/checkout/order/$orderCode');
+
+    final data = response.data;
+
+    if (data is Map && data.containsKey('data')) {
+      return data['data']; // kalau dibungkus
+    }
+
+    return data; // kalau langsung
+  }
 }

@@ -2,6 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_warungnya_warga_net/features/address/models/address_model.dart';
 import 'package:flutter_warungnya_warga_net/features/address/presentation/address_form_page.dart';
 import 'package:flutter_warungnya_warga_net/features/address/presentation/address_list_page.dart';
+import 'package:flutter_warungnya_warga_net/features/help/presentation/CaraBelanjaPage.dart';
+import 'package:flutter_warungnya_warga_net/features/help/presentation/FaqPage.dart';
+import 'package:flutter_warungnya_warga_net/features/help/presentation/InfoMenuPage.dart';
+import 'package:flutter_warungnya_warga_net/features/help/presentation/TermsPage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_warungnya_warga_net/core/constant/order_status.dart';
 import 'package:flutter_warungnya_warga_net/features/auth/presentation/register.dart';
@@ -82,6 +86,19 @@ final routerProvider = Provider<GoRouter>((ref) {
           return OrderListPage(status: status);
         },
       ),
+
+      GoRoute(
+        path: '/help',
+        name: 'help',
+        builder: (_, __) => const InfoMenuPage(),
+      ),
+      GoRoute(path: '/faq', name: 'faq', builder: (_, __) => const FaqPage()),
+      GoRoute(
+        path: '/cara-belanja',
+        builder: (context, state) => const CaraBelanjaPage(),
+      ),
+
+      GoRoute(path: '/terms', builder: (context, state) => const TermsPage()),
 
       GoRoute(
         path: '/addresses',

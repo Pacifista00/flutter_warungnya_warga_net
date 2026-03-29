@@ -62,12 +62,12 @@ class ProfilePage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
 
-                const SettingItem(
-                  icon: Icons.settings_outlined,
-                  title: 'Pengaturan Akun',
-                  subtitle:
-                      'Ubah Kata Sandi, Tambah Alamat, Logout, dan lainnya',
-                ),
+                // const SettingItem(
+                //   icon: Icons.settings_outlined,
+                //   title: 'Pengaturan Akun',
+                //   subtitle:
+                //       'Ubah Kata Sandi, Tambah Alamat, Logout, dan lainnya',
+                // ),
                 SettingItem(
                   icon: Icons.location_on_outlined,
                   title: 'Alamat',
@@ -76,10 +76,14 @@ class ProfilePage extends ConsumerWidget {
                     context.push('/addresses');
                   },
                 ),
-                const SettingItem(
+                SettingItem(
                   icon: Icons.help_outline,
                   title: 'Pusat Bantuan',
-                  subtitle: 'FAQ, Hubungi Kami, Tour Aplikasi',
+                  subtitle:
+                      'FAQ, Cara Belanja, Syarat & ketentuan, Hubungi Kami',
+                  onTap: () {
+                    context.push('/help');
+                  },
                 ),
                 const SettingItem(
                   icon: Icons.store_outlined,

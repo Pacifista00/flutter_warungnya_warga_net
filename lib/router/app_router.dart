@@ -5,6 +5,7 @@ import 'package:flutter_warungnya_warga_net/features/address/presentation/addres
 import 'package:flutter_warungnya_warga_net/features/help/presentation/CaraBelanjaPage.dart';
 import 'package:flutter_warungnya_warga_net/features/help/presentation/FaqPage.dart';
 import 'package:flutter_warungnya_warga_net/features/help/presentation/InfoMenuPage.dart';
+import 'package:flutter_warungnya_warga_net/features/help/presentation/LocationPage.dart';
 import 'package:flutter_warungnya_warga_net/features/help/presentation/TermsPage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_warungnya_warga_net/core/constant/order_status.dart';
@@ -99,6 +100,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       GoRoute(path: '/terms', builder: (context, state) => const TermsPage()),
+      GoRoute(
+        path: '/location',
+        builder: (context, state) => const LocationPage(),
+      ),
 
       GoRoute(
         path: '/addresses',

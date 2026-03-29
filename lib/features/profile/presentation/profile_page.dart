@@ -85,10 +85,13 @@ class ProfilePage extends ConsumerWidget {
                     context.push('/help');
                   },
                 ),
-                const SettingItem(
+                SettingItem(
                   icon: Icons.store_outlined,
                   title: 'Lokasi Kami',
                   subtitle: 'Temukan Gudang kami',
+                  onTap: () {
+                    context.push('/location');
+                  },
                 ),
                 SettingItem(
                   icon: Icons.logout,

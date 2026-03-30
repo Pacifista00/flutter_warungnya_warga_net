@@ -115,7 +115,7 @@ class FaqPage extends StatelessWidget {
                       Text(
                         section["title"] as String,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -138,16 +138,19 @@ class FaqPage extends StatelessWidget {
                           vertical: 4,
                         ),
                         childrenPadding: const EdgeInsets.fromLTRB(
-                          16,
+                          14,
                           0,
-                          16,
-                          16,
+                          14,
+                          14,
                         ),
                         shape: const Border(),
                         collapsedShape: const Border(),
                         title: Text(
                           item["q"] as String,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
                         ),
                         iconColor: Colors.black,
                         collapsedIconColor: Colors.black,
@@ -158,7 +161,7 @@ class FaqPage extends StatelessWidget {
                               item["a"] as String,
                               style: const TextStyle(
                                 color: Colors.black87,
-                                height: 1.5,
+                                fontSize: 14,
                               ),
                             ),
                           ),

@@ -7,6 +7,7 @@ import 'package:flutter_warungnya_warga_net/widgets/format_date_time.dart';
 import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 import 'package:flutter_warungnya_warga_net/widgets/order_status_helper.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../models/order_model.dart';
 import '../services/order_service.dart';
 
@@ -165,7 +166,12 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 
   String formatCurrency(int value) {
-    return "Rp${value.toString()}";
+    final formatter = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp',
+      decimalDigits: 0,
+    );
+    return formatter.format(value);
   }
 
   Widget _paymentStamp(String status) {

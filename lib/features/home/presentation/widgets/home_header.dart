@@ -142,7 +142,7 @@ class HeaderSection extends ConsumerWidget {
               filled: true,
               fillColor: Colors.white,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(50),
                 borderSide: BorderSide.none,
               ),
             ),

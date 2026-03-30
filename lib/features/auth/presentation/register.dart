@@ -39,7 +39,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     final password = _passwordController.text;
     final confirm = _confirmPasswordController.text;
 
-    /// VALIDASI FORM
     if (name.isEmpty || email.isEmpty || password.isEmpty || confirm.isEmpty) {
       return AppDialog.show(
         context,
@@ -77,10 +76,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             'Akun berhasil dibuat.\nSilakan login dan verifikasi akun anda',
         onPressed: () {
           Navigator.of(context).pop();
-          context.push(
-            '/verify-email',
-            extra: email, // email user
-          );
+          context.push('/verify-email', extra: email);
         },
       );
     } catch (e) {
@@ -101,118 +97,117 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: Colors.white, // Background polos sesuai LoginPage
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              /// HEADER
-              Container(
-                height: 200,
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(32),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                /// LOGO (Sama dengan LoginPage)
+                Image.asset(
+                  'assets/images/logo/logo.png',
+                  height: 100,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "Warung Net",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
                 ),
-                child: const Center(
-                  child: Icon(Icons.person_add, size: 48, color: Colors.white),
-                ),
-              ),
+                const SizedBox(height: 40),
 
-              /// FORM CARD
-              Transform.translate(
-                offset: const Offset(0, -40),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 20,
-                          color: Colors.black.withValues(alpha: 0.1),
-                        ),
-                      ],
+                /// FORM SECTION
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Daftar Akun',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    child: Column(
-                      children: [
-                        const Text(
-                          'Register',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
-                        AppTextField(
-                          label: 'Full Name',
-                          hint: 'John Doe',
-                          controller: _nameController,
-                        ),
-                        const SizedBox(height: 16),
+                    /// FULL NAME
+                    AppTextField(
+                      label: 'Nama Lengkap',
+                      hint: 'John Doe',
+                      controller: _nameController,
+                    ),
+                    const SizedBox(height: 16),
 
-                        AppTextField(
-                          label: 'Email',
-                          hint: 'register@abcd.com',
-                          keyboardType: TextInputType.emailAddress,
-                          controller: _emailController,
-                        ),
-                        const SizedBox(height: 16),
+                    /// EMAIL
+                    AppTextField(
+                      label: 'Email',
+                      hint: 'nama@email.com',
+                      keyboardType: TextInputType.emailAddress,
+                      controller: _emailController,
+                    ),
+                    const SizedBox(height: 16),
 
-                        AppTextField(
-                          label: 'Password',
-                          hint: '********',
-                          obscureText: true,
-                          controller: _passwordController,
-                        ),
-                        const SizedBox(height: 16),
+                    /// PASSWORD
+                    AppTextField(
+                      label: 'Password',
+                      hint: '********',
+                      obscureText: true,
+                      controller: _passwordController,
+                    ),
+                    const SizedBox(height: 16),
 
-                        AppTextField(
-                          label: 'Confirm Password',
-                          hint: '********',
-                          obscureText: true,
-                          controller: _confirmPasswordController,
-                        ),
-                        const SizedBox(height: 24),
+                    /// CONFIRM PASSWORD
+                    AppTextField(
+                      label: 'Konfirmasi Password',
+                      hint: '********',
+                      obscureText: true,
+                      controller: _confirmPasswordController,
+                    ),
+                    const SizedBox(height: 32),
 
-                        AppButton(
-                          text: _isLoading ? 'Loading...' : 'Register',
-                          onPressed: _isLoading ? null : _onRegisterPressed,
-                        ),
+                    /// TOMBOL REGISTER
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: AppButton(
+                        text: _isLoading ? 'Memproses...' : 'DAFTAR',
+                        onPressed: _isLoading ? null : _onRegisterPressed,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
 
-                        const SizedBox(height: 24),
-
-                        /// FOOTER
-                        Text.rich(
-                          TextSpan(
-                            text: 'Already have an account? ',
-                            children: [
-                              TextSpan(
-                                text: 'Login',
-                                style: const TextStyle(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                recognizer:
-                                    TapGestureRecognizer()
-                                      ..onTap = () {
-                                        context.push('/login');
-                                      },
+                    /// FOOTER LINK
+                    Center(
+                      child: Text.rich(
+                        TextSpan(
+                          text: 'Sudah mempunyai akun? ',
+                          style: TextStyle(color: Colors.grey.shade600),
+                          children: [
+                            TextSpan(
+                              text: 'Login',
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ],
-                          ),
+                              recognizer:
+                                  TapGestureRecognizer()
+                                    ..onTap = () {
+                                      context.push('/login');
+                                    },
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

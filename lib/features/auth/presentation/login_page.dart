@@ -28,8 +28,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    /// ambil query param `from` sekali saja
     final uri = GoRouterState.of(context).uri;
     _from = uri.queryParameters['from'] ?? '/home';
   }
@@ -45,7 +43,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    /// VALIDASI FORM
     if (email.isEmpty || password.isEmpty) {
       await AppDialog.show(
         context,
@@ -66,20 +63,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       context.push(_from);
     } catch (e) {
       if (!mounted) return;
-
       final message = e is AuthException ? e.message : 'Terjadi kesalahan.';
-
-      await AppDialog.show(context, title: 'Error', message: message);
 
       if (e is EmailNotVerifiedException) {
         context.push('/verify-email', extra: e.email);
         return;
       }
 
-      if (e is InvalidCredentialException) {
-        await AppDialog.show(context, title: 'Login gagal', message: e.message);
-        return;
-      }
+      await AppDialog.show(context, title: 'Login Gagal', message: message);
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -93,148 +84,107 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-
         final isFromProtected = protectedRoutes.any(
           (route) => _from.startsWith(route),
         );
-
         context.push(isFromProtected ? '/home' : _from);
       },
       child: Scaffold(
-        backgroundColor: Colors.grey.shade100,
+        backgroundColor: Colors.white, // Background polos total
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                /// HEADER
-                Container(
-                  height: 200,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(32),
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  /// LOGO LANGSUNG DI ATAS
+                  Image.asset(
+                    'assets/images/logo/logo.png',
+                    height:
+                        120, // Ukuran logo sedikit diperbesar agar proporsional
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Wawanet",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
                   ),
-                  child: const Center(
-                    child: Icon(Icons.lock, size: 48, color: Colors.white),
-                  ),
-                ),
+                  const SizedBox(height: 48),
 
-                /// FORM CARD
-                Transform.translate(
-                  offset: const Offset(0, -40),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 20,
-                            color: Colors.black.withValues(alpha: 0.1),
-                          ),
-                        ],
+                  /// FORM LOGIN TANPA SHADOW BERLEBIH (MINIMALIS)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Login',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Center(
-                            child: Text(
-                              'Login',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
+                      const SizedBox(height: 32),
 
-                          /// EMAIL
-                          AppTextField(
-                            label: 'Email',
-                            hint: 'login@abcd.com',
-                            keyboardType: TextInputType.emailAddress,
-                            controller: _emailController,
-                          ),
-                          const SizedBox(height: 16),
+                      /// FIELD EMAIL
+                      AppTextField(
+                        label: 'Email',
+                        hint: 'Masukkan email Anda',
+                        keyboardType: TextInputType.emailAddress,
+                        controller: _emailController,
+                      ),
+                      const SizedBox(height: 20),
 
-                          /// PASSWORD
-                          AppTextField(
-                            label: 'Password',
-                            hint: '********',
-                            obscureText: true,
-                            controller: _passwordController,
-                          ),
-                          const SizedBox(height: 24),
+                      /// FIELD PASSWORD
+                      AppTextField(
+                        label: 'Password',
+                        hint: 'Masukkan password',
+                        obscureText: true,
+                        controller: _passwordController,
+                      ),
+                      const SizedBox(height: 32),
 
-                          /// LOGIN BUTTON
-                          AppButton(
-                            text: _isLoading ? 'Loading...' : 'Login',
-                            onPressed:
-                                _isLoading
-                                    ? null
-                                    : () {
-                                      _onLoginPressed();
-                                    },
-                          ),
+                      /// TOMBOL LOGIN
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: AppButton(
+                          text: _isLoading ? 'Memproses...' : 'MASUK',
+                          onPressed: _isLoading ? null : _onLoginPressed,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
 
-                          const SizedBox(height: 24),
-
-                          /// OR
-                          const Row(
+                      /// LINK DAFTAR
+                      Center(
+                        child: Text.rich(
+                          TextSpan(
+                            text: "Belum punya akun? ",
+                            style: TextStyle(color: Colors.grey.shade600),
                             children: [
-                              Expanded(child: Divider()),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Text('Or'),
+                              TextSpan(
+                                text: 'Daftar Sekarang',
+                                style: const TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                recognizer:
+                                    TapGestureRecognizer()
+                                      ..onTap = () {
+                                        context.push('/register?from=$_from');
+                                      },
                               ),
-                              Expanded(child: Divider()),
                             ],
                           ),
-
-                          const SizedBox(height: 16),
-
-                          /// GOOGLE LOGIN (placeholder)
-                          AppButton(
-                            text: 'Login with Google',
-                            onPressed: () {},
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          /// REGISTER LINK
-                          Center(
-                            child: Text.rich(
-                              TextSpan(
-                                text: "Don't have any account? ",
-                                children: [
-                                  TextSpan(
-                                    text: 'Sign Up',
-                                    style: const TextStyle(
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    recognizer:
-                                        TapGestureRecognizer()
-                                          ..onTap = () {
-                                            context.push(
-                                              '/register?from=$_from',
-                                            );
-                                          },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

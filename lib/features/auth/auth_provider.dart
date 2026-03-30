@@ -69,6 +69,32 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = const AuthState(status: AuthStatus.unauthenticated);
   }
 
+  Future<void> updateProfile(Map<String, dynamic> data) async {
+    if (state.user == null) return;
+
+    try {
+      final updatedUser = await repository.updateProfile(data);
+
+      // update state user
+      state = state.copyWith(user: {...?state.user, ...updatedUser});
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updatePhoto(String filePath) async {
+    if (state.user == null) return;
+
+    try {
+      final updatedUser = await repository.updatePhoto(filePath);
+
+      // update state user
+      state = state.copyWith(user: {...?state.user, ...updatedUser});
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   bool get isLoggedIn => state.status == AuthStatus.authenticated;
 
   Map<String, dynamic>? get currentUser => state.user;

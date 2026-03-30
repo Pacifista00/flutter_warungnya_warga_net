@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_warungnya_warga_net/core/ui/app_confirm_dialog.dart';
 import 'package:flutter_warungnya_warga_net/features/auth/auth_controller_provider.dart';
+import 'package:flutter_warungnya_warga_net/features/auth/auth_provider.dart';
+import 'package:flutter_warungnya_warga_net/features/auth/domain/auth_state.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/bottom_nav.dart';
 import 'package:flutter_warungnya_warga_net/features/profile/widgets/profile.header.dart';
@@ -14,6 +16,14 @@ class ProfilePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Ambil authState di luar ListView
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+    final points =
+        authState.status == AuthStatus.authenticated && user != null
+            ? (user['point']?['total_points'] ?? 0)
+            : 0;
+
     return Scaffold(
       backgroundColor: const Color(0xffF4F5F7),
       body: Column(
@@ -30,11 +40,11 @@ class ProfilePage extends ConsumerWidget {
                 /// INFO CARD
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: InfoCard(
                         icon: Icons.monetization_on_outlined,
                         title: 'Poin',
-                        value: '0',
+                        value: points.toString(),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -44,7 +54,7 @@ class ProfilePage extends ConsumerWidget {
                         onTap: () {
                           context.push('/voucher');
                         },
-                        child: InfoCard(
+                        child: const InfoCard(
                           icon: Icons.discount_outlined,
                           title: 'Voucher',
                           subtitle: 'Lihat Voucher',
@@ -62,12 +72,6 @@ class ProfilePage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
 
-                // const SettingItem(
-                //   icon: Icons.settings_outlined,
-                //   title: 'Pengaturan Akun',
-                //   subtitle:
-                //       'Ubah Kata Sandi, Tambah Alamat, Logout, dan lainnya',
-                // ),
                 SettingItem(
                   icon: Icons.location_on_outlined,
                   title: 'Alamat',

@@ -42,4 +42,44 @@ class AuthApi {
   Future<void> resendOtp({required String email}) async {
     await _dio.post('/resend-otp', data: {'email': email});
   }
+
+  Future<Map<String, dynamic>> updateUserProfile(
+    Map<String, dynamic> data,
+  ) async {
+    final response = await _dio.put(
+      '/profile/update', // endpoint update profile di backend
+      data: data,
+    );
+
+    // misal backend mengembalikan user terbaru
+    return response.data['user'];
+  }
+
+  Future<Map<String, dynamic>> updatePhoto(String filePath) async {
+    // 1. Siapkan file
+    final file = await MultipartFile.fromFile(
+      filePath,
+      filename: filePath.split('/').last,
+    );
+
+    // 2. Gunakan POST, tapi tambahkan '_method': 'PUT'
+    final formData = FormData.fromMap({
+      'photo': file,
+      '_method': 'PUT', // Ini kuncinya!
+    });
+
+    final response = await _dio.post(
+      // Ubah dari .put ke .post
+      '/profile/photo/update',
+      data: formData,
+      options: Options(
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Accept': 'application/json', // Pastikan Laravel tahu ini request API
+        },
+      ),
+    );
+
+    return response.data['user'];
+  }
 }

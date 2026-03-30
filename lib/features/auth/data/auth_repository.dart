@@ -72,4 +72,25 @@ class AuthRepository {
       throw AuthException(message);
     }
   }
+
+  Future<Map<String, dynamic>> updateProfile(Map<String, dynamic> data) async {
+    try {
+      final updatedUser = await api.updateUserProfile(data);
+      return updatedUser;
+    } on DioException catch (e) {
+      final message = e.response?.data['message'] ?? 'Gagal memperbarui profil';
+      throw AuthException(message);
+    }
+  }
+
+  Future<Map<String, dynamic>> updatePhoto(String filePath) async {
+    try {
+      final updatedUser = await api.updatePhoto(filePath);
+      return updatedUser;
+    } on DioException catch (e) {
+      final message =
+          e.response?.data['message'] ?? 'Gagal memperbarui foto profil';
+      throw AuthException(message);
+    }
+  }
 }

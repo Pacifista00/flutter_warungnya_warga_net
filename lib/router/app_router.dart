@@ -7,6 +7,8 @@ import 'package:flutter_warungnya_warga_net/features/help/presentation/FaqPage.d
 import 'package:flutter_warungnya_warga_net/features/help/presentation/InfoMenuPage.dart';
 import 'package:flutter_warungnya_warga_net/features/help/presentation/LocationPage.dart';
 import 'package:flutter_warungnya_warga_net/features/help/presentation/TermsPage.dart';
+import 'package:flutter_warungnya_warga_net/features/profile/presentation/edit_photo_page.dart';
+import 'package:flutter_warungnya_warga_net/features/profile/presentation/edit_profile_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_warungnya_warga_net/core/constant/order_status.dart';
 import 'package:flutter_warungnya_warga_net/features/auth/presentation/register.dart';
@@ -76,6 +78,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       GoRoute(path: '/profile', builder: (_, __) => const ProfilePage()),
+      GoRoute(
+        path: '/profile/edit',
+        builder: (context, state) => const EditProfilePage(),
+      ),
+      GoRoute(
+        path: '/profile/edit-photo',
+        builder: (context, state) => const EditPhotoPage(),
+      ),
       GoRoute(path: '/cart', builder: (_, __) => const CartPage()),
 
       GoRoute(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 
 class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -19,23 +18,7 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         IconButton(
           onPressed: onCartPressed,
-          icon: Stack(
-            children: [
-              const Icon(Icons.shopping_cart_outlined),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          icon: Stack(children: [const Icon(Icons.shopping_cart_outlined)]),
         ),
         const SizedBox(width: 8),
       ],

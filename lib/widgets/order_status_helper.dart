@@ -43,7 +43,7 @@ class OrderStatusHelper {
         return "Kurir sedang menuju lokasi pengambilan paket.";
 
       case "picked":
-        return "Paket telah diambil oleh kurir.";
+        return "Paket sedang dalam pengiriman.";
 
       case "dropping_off":
         return "Paket sedang dalam perjalanan ke alamat tujuan.";

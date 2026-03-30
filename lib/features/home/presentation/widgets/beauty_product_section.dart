@@ -1,0 +1,113 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/services/cart_service.dart';
+import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/product_card_sekeleton.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_warungnya_warga_net/features/home/data/datasources/product_remote_datasource.dart';
+import 'package:flutter_warungnya_warga_net/features/home/data/models/product_model.dart';
+import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/product_card.dart';
+import 'package:flutter_warungnya_warga_net/features/home/presentation/widgets/section_title.dart';
+
+class BeautyProductSection extends StatefulWidget {
+  const BeautyProductSection({super.key});
+
+  @override
+  State<BeautyProductSection> createState() => _BeautyProductSectionState();
+}
+
+class _BeautyProductSectionState extends State<BeautyProductSection> {
+  final ProductRemoteDatasource _datasource = ProductRemoteDatasource();
+  final cartService = CartService();
+
+  late Future<List<ProductModel>> _futureProducts;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureProducts = _datasource.getBeautyProducts();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionTitle(
+          title: 'Produk Kecantikan',
+          onTap: () {
+            context.push('/produk?category=kecantikan');
+          },
+        ),
+        const SizedBox(height: 12),
+
+        SizedBox(
+          height: 230,
+          child: FutureBuilder<List<ProductModel>>(
+            future: _futureProducts,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const ProductCardSkeleton();
+              }
+
+              if (snapshot.hasError) {
+                return const Center(child: Text('Gagal memuat produk'));
+              }
+
+              final products = snapshot.data ?? [];
+
+              if (products.isEmpty) {
+                return const Center(child: Text('Produk tidak tersedia'));
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.only(left: 16),
+                scrollDirection: Axis.horizontal,
+                cacheExtent: 500,
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+
+                  return InkWell(
+                    onTap: () {
+                      context.push('/product/${product.id}');
+                    },
+                    child: ProductCard(
+                      productId: product.id,
+                      title: product.name,
+                      description: product.description,
+                      price: 'Rp ${product.price}',
+                      imageUrl: product.imageUrl,
+                      onAddToCart: () async {
+                        try {
+                          await cartService.addToCart(
+                            productId: product.id,
+                            quantity: 1,
+                          );
+
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Produk ditambahkan ke keranjang",
+                                ),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
+                        }
+                      },
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}

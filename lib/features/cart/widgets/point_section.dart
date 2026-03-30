@@ -52,6 +52,7 @@ class _PointsSectionState extends State<PointsSection> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       margin: const EdgeInsets.only(top: 16),
       child: Padding(
         padding: const EdgeInsets.all(16),

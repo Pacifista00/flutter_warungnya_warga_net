@@ -80,12 +80,13 @@ class _VoucherFormState extends State<VoucherForm> {
                 controller: controller,
                 decoration: InputDecoration(
                   hintText: 'Masukkan kode voucher',
+                  hintStyle: TextStyle(fontSize: 14, color: Colors.black),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 12,
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(50),
                   ),
                 ),
               ),

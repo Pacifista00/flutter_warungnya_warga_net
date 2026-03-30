@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/widgets/skeleton/cart_skeleton.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:flutter_warungnya_warga_net/features/auth/auth_provider.dart';
@@ -87,7 +88,16 @@ class _CartPageState extends ConsumerState<CartPage> {
         future: _combinedDataFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                ...List.generate(3, (_) => const CartItemCardSkeleton()),
+                const OrderSummarySkeleton(),
+                const ShippingDropdownSkeleton(),
+                const VoucherFormSkeleton(),
+                const PointsSectionSkeleton(),
+              ],
+            );
           }
           if (snapshot.hasError) {
             return const Center(child: Text('Gagal memuat data'));

@@ -47,7 +47,7 @@ class OrderSummaryCard extends StatelessWidget {
             'Ringkasan Pesanan',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           _summaryRow('Subtotal Produk', _format(subtotal)),
           if (pointsDiscount > 0)
             _summaryRow(
@@ -79,7 +79,7 @@ class OrderSummaryCard extends StatelessWidget {
     Color valueColor = Colors.black,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

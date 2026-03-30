@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/widgets/skeleton/cart_skeleton.dart';
 import '../services/cart_service.dart';
 import '../models/shipping_model.dart';
 
@@ -40,7 +42,7 @@ class _ShippingDropdownState extends State<ShippingDropdown> {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const ShippingDropdownSkeleton();
     }
 
     if (shippingList.isEmpty) {
@@ -59,6 +61,27 @@ class _ShippingDropdownState extends State<ShippingDropdown> {
         DropdownButtonFormField<ShippingModel>(
           value: selected,
           hint: const Text("Ketuk untuk memilih kurir"),
+          style: TextStyle(fontSize: 14, color: Colors.black),
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(50), // 🔹 capsule
+              borderSide: const BorderSide(color: Colors.grey),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(50),
+              borderSide: const BorderSide(color: Colors.grey),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(50),
+              borderSide: BorderSide(color: AppColors.primary),
+            ),
+            fillColor: Colors.grey.shade100,
+            filled: true,
+          ),
           items:
               shippingList.map((option) {
                 return DropdownMenuItem(
@@ -66,6 +89,7 @@ class _ShippingDropdownState extends State<ShippingDropdown> {
                   child: Text(
                     "${option.courierName} - ${option.serviceName} "
                     "(${option.duration}) - Rp ${option.price}",
+                    style: const TextStyle(fontSize: 14),
                   ),
                 );
               }).toList(),

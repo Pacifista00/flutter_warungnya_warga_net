@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_warungnya_warga_net/core/constant/product_categories.dart';
+import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 
 enum SortType { terbaru, hargaTermurah, hargaTermahal, namaAZ }
 
@@ -96,28 +97,30 @@ class _ProductFilterSheetState extends State<ProductFilterSheet> {
             const SizedBox(height: 16),
 
             /// ACTION
+            /// ACTION
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton(
+                  child: AppButton(
+                    text: 'Reset',
+                    backgroundColor: Colors.white,
+                    textColor: Colors.black87,
                     onPressed: () {
                       setState(() {
                         category = '';
                         sortType = SortType.terbaru;
                       });
                     },
-
-                    child: const Text('Reset'),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton(
+                  child: AppButton(
+                    text: 'Terapkan',
                     onPressed: () {
                       widget.onApply(category, sortType);
                       Navigator.pop(context);
                     },
-                    child: const Text('Terapkan'),
                   ),
                 ),
               ],

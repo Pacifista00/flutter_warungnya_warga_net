@@ -15,7 +15,11 @@ const productCategories = [
     'elektronik',
     'assets/svg/category_logo/Elektronik.svg',
   ),
-  ProductCategory('Minuman', 'minuman', 'assets/svg/category_logo/Minuman.svg'),
+  ProductCategory(
+    'Ibu & Anak',
+    'ibu-anak',
+    'assets/svg/category_logo/Ibu&Anak.svg',
+  ),
   ProductCategory('Herbal', 'herbal', 'assets/svg/category_logo/Herbal.svg'),
   ProductCategory(
     'Kecantikan',
@@ -23,11 +27,15 @@ const productCategories = [
     'assets/svg/category_logo/Kecantikan.svg',
   ),
   ProductCategory(
-    'Olahraga',
-    'olahraga',
-    'assets/svg/category_logo/Olahraga.svg',
+    'Kebersihan',
+    'kebersihan',
+    'assets/svg/category_logo/Kebersihan.svg',
   ),
-  ProductCategory('Buku', 'buku', 'assets/svg/category_logo/Buku.svg'),
+  ProductCategory(
+    'Kantor',
+    'perlengkapan-sekolah-kantor',
+    'assets/svg/category_logo/Alat Tulis.svg',
+  ),
   ProductCategory('Hobi', 'hobi', 'assets/svg/category_logo/Hobi.svg'),
   ProductCategory(
     'Kesehatan',
@@ -35,8 +43,8 @@ const productCategories = [
     'assets/svg/category_logo/Kesehatan.svg',
   ),
   ProductCategory(
-    'Alat Tulis',
-    'alat-tulis',
-    'assets/svg/category_logo/Alat Tulis.svg',
+    'Rumah Tangga',
+    'rumah-tangga',
+    'assets/svg/category_logo/RumahTangga.svg',
   ),
 ];

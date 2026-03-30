@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
+import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 import 'package:go_router/go_router.dart';
 import '../models/address_model.dart';
 import '../services/address_service.dart';
@@ -121,7 +123,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.bold,
-          color: Colors.blue.shade800,
+          color: AppColors.primary,
         ),
       ),
     );
@@ -155,11 +157,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
                         ),
                       ),
                     ),
-                    child: Icon(
-                      prefixIcon,
-                      size: 20,
-                      color: Colors.blue.shade700,
-                    ),
+                    child: Icon(prefixIcon, size: 20, color: AppColors.primary),
                   )
                   : null,
           prefixIconConstraints: const BoxConstraints(
@@ -182,7 +180,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.blue.shade700, width: 1.5),
+            borderSide: BorderSide(color: AppColors.primary, width: 1.5),
           ),
         ),
         validator:
@@ -279,10 +277,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        secondary: Icon(
-                          Icons.star,
-                          color: Colors.blue.shade600,
-                        ),
+                        secondary: Icon(Icons.star, color: AppColors.primary),
                         onChanged: (v) => setState(() => isDefault = v),
                       ),
                     ),
@@ -308,33 +303,14 @@ class _AddressFormPageState extends State<AddressFormPage> {
               child: SizedBox(
                 width: double.infinity,
                 height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade700,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  onPressed: loading ? null : submit,
-                  child:
+                child: AppButton(
+                  text:
                       loading
-                          ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                          : Text(
-                            isEdit ? "Simpan Perubahan" : "Tambah Alamat",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          ? "Memproses..."
+                          : isEdit
+                          ? "Simpan Perubahan"
+                          : "Tambah Alamat",
+                  onPressed: loading ? null : submit,
                 ),
               ),
             ),

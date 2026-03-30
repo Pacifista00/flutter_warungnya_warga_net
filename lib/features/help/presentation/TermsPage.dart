@@ -19,20 +19,6 @@ class TermsPage extends StatelessWidget {
     }
   }
 
-  Widget _subHeading(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: AppColors.primary,
-        ),
-      ),
-    );
-  }
-
   Widget _subHeading2(String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -231,31 +217,6 @@ class TermsPage extends StatelessWidget {
             _subHeading2("16. Kontak"),
             _paragraph(
               "Jika Anda memiliki pertanyaan mengenai Syarat & Ketentuan ini, silakan hubungi layanan pelanggan melalui tombol di bawah.",
-            ),
-
-            // Button WA
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: ElevatedButton(
-                  onPressed: _openWhatsApp,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: const Text(
-                    "Hubungi Kami",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
             ),
           ],
         ),

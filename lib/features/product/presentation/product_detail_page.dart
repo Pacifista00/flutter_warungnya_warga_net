@@ -1,13 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
+import 'package:flutter_warungnya_warga_net/features/cart/services/cart_service.dart';
 import 'package:flutter_warungnya_warga_net/features/product/data/datasources/product_remote_datasource.dart';
 import 'package:flutter_warungnya_warga_net/features/product/models/product_model.dart';
 import 'package:flutter_warungnya_warga_net/features/product/widgets/product_detail_skeleton.dart';
+import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 
-class ProductDetailPage extends StatelessWidget {
+// ================= PRODUCT DETAIL PAGE =================
+class ProductDetailPage extends StatefulWidget {
   final String productId;
 
   const ProductDetailPage({super.key, required this.productId});
+
+  @override
+  State<ProductDetailPage> createState() => _ProductDetailPageState();
+}
+
+class _ProductDetailPageState extends State<ProductDetailPage> {
+  bool _isLoading = false;
+  late Future<ProductModel> _productFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _productFuture = ProductRemoteDatasource().getProductById(widget.productId);
+  }
+
+  Future<void> _handleAddToCart(String productId) async {
+    setState(() => _isLoading = true);
+    try {
+      await CartService().addToCart(productId: productId);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Produk berhasil ditambahkan ke keranjang'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +56,7 @@ class ProductDetailPage extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       body: FutureBuilder<ProductModel>(
-        future: ProductRemoteDatasource().getProductById(productId),
+        future: _productFuture, // <-- pakai future yang sudah disimpan
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const ProductDetailSkeleton();
@@ -35,7 +72,6 @@ class ProductDetailPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ================= IMAGE =================
                 SizedBox(
                   height: 320,
                   width: double.infinity,
@@ -46,14 +82,11 @@ class ProductDetailPage extends StatelessWidget {
                         (_, __, ___) => const Icon(Icons.image, size: 80),
                   ),
                 ),
-
-                // ================= CONTENT =================
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // TITLE
                       Text(
                         product.name,
                         style: const TextStyle(
@@ -61,10 +94,7 @@ class ProductDetailPage extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       const SizedBox(height: 8),
-
-                      // PRICE
                       Text(
                         'Rp ${product.price}',
                         style: const TextStyle(
@@ -73,17 +103,7 @@ class ProductDetailPage extends StatelessWidget {
                           color: AppColors.primary,
                         ),
                       ),
-
-                      const SizedBox(height: 4),
-
-                      // STOCK
-                      // Text(
-                      //   'Stok: ${product.stock}',
-                      //   style: const TextStyle(color: Colors.grey),
-                      // ),
                       const SizedBox(height: 16),
-
-                      // DESCRIPTION
                       const Text(
                         'Deskripsi Produk',
                         style: TextStyle(fontWeight: FontWeight.w600),
@@ -101,35 +121,13 @@ class ProductDetailPage extends StatelessWidget {
           );
         },
       ),
-
-      // ================= ADD TO CART =================
       bottomNavigationBar: SafeArea(
-        child: Container(
+        child: Padding(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, -2),
-              ),
-            ],
-          ),
-          child: SizedBox(
-            height: 48,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-              ),
-              onPressed: () {
-                // TODO: add to cart
-              },
-              child: const Text(
-                'Tambah ke Keranjang',
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
-            ),
+          child: AppButton(
+            text: _isLoading ? 'Loading...' : 'Tambah ke Keranjang',
+            onPressed:
+                _isLoading ? null : () => _handleAddToCart(widget.productId),
           ),
         ),
       ),

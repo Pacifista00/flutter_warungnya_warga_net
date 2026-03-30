@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_warungnya_warga_net/features/auth/auth_provider.dart';
+import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 import 'package:go_router/go_router.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
@@ -201,23 +202,11 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               SizedBox(
                 width: double.infinity,
                 height: 50,
-                child: ElevatedButton(
+                child: AppButton(
+                  text: loading ? "Loading..." : "Simpan Perubahan",
                   onPressed: loading ? null : submit,
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child:
-                      loading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                            "Simpan Perubahan",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
+                  height: 50,
+                  // borderRadius: 50, // optional, default AppButton sudah kapsul
                 ),
               ),
             ],

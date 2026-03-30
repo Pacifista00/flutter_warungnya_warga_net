@@ -5,7 +5,7 @@ import 'package:flutter_warungnya_warga_net/core/ui/app_dialog.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
-import 'package:flutter_warungnya_warga_net/widgets/forms/app_primary_button.dart';
+import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 import 'package:flutter_warungnya_warga_net/widgets/forms/app_text_field.dart';
 import 'package:flutter_warungnya_warga_net/features/auth/auth_controller_provider.dart';
 
@@ -180,7 +180,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         ),
                         const SizedBox(height: 24),
 
-                        AppPrimaryButton(
+                        AppButton(
                           text: _isLoading ? 'Loading...' : 'Register',
                           onPressed: _isLoading ? null : _onRegisterPressed,
                         ),

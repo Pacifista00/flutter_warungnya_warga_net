@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:flutter_warungnya_warga_net/router/route_rules.dart';
-import 'package:flutter_warungnya_warga_net/widgets/forms/app_primary_button.dart';
+import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 import 'package:flutter_warungnya_warga_net/widgets/forms/app_text_field.dart';
 import 'package:flutter_warungnya_warga_net/features/auth/auth_controller_provider.dart';
 
@@ -171,7 +171,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           const SizedBox(height: 24),
 
                           /// LOGIN BUTTON
-                          AppPrimaryButton(
+                          AppButton(
                             text: _isLoading ? 'Loading...' : 'Login',
                             onPressed:
                                 _isLoading
@@ -198,7 +198,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           const SizedBox(height: 16),
 
                           /// GOOGLE LOGIN (placeholder)
-                          AppPrimaryButton(
+                          AppButton(
                             text: 'Login with Google',
                             onPressed: () {},
                           ),

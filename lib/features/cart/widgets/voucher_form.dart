@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:flutter_warungnya_warga_net/features/cart/services/voucher_services.dart';
+import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 
 class VoucherForm extends StatefulWidget {
   final void Function(int discount, String? code)? onApplied;
@@ -37,7 +38,7 @@ class _VoucherFormState extends State<VoucherForm> {
         success = true;
         voucher = result['voucher'];
         discount = result['discount'];
-        message = "Voucher berhasil digunakan 🎉";
+        message = "Voucher berhasil digunakan!";
       });
 
       widget.onApplied?.call(discount, voucher!['code']);
@@ -92,24 +93,23 @@ class _VoucherFormState extends State<VoucherForm> {
 
             const SizedBox(width: 8),
 
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(80, 48), // penting
+            SizedBox(
+              width: 100, // atur lebar tombol sesuai kebutuhan
+              child: AppButton(
+                text: loading ? '' : 'Apply',
+                onPressed: loading ? null : applyVoucher,
+                child:
+                    loading
+                        ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                        : null,
               ),
-              onPressed: loading ? null : applyVoucher,
-              child:
-                  loading
-                      ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                      : const Text('Apply'),
             ),
           ],
         ),

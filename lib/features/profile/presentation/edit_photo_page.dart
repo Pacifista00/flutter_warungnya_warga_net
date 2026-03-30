@@ -7,6 +7,7 @@ import 'package:flutter_warungnya_warga_net/config/env/prod_env.dart';
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:flutter_warungnya_warga_net/features/auth/auth_provider.dart';
 import 'package:flutter_warungnya_warga_net/features/auth/domain/auth_exceptions.dart';
+import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditPhotoPage extends ConsumerStatefulWidget {
@@ -128,6 +129,7 @@ class _EditPhotoPageState extends ConsumerState<EditPhotoPage> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -162,32 +164,9 @@ class _EditPhotoPageState extends ConsumerState<EditPhotoPage> {
             SizedBox(
               width: double.infinity,
               height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+              child: AppButton(
+                text: _loading ? "Loading..." : "Simpan Foto",
                 onPressed: _loading ? null : _uploadPhoto,
-                child:
-                    _loading
-                        ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                        : const Text(
-                          "Simpan Foto",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
               ),
             ),
           ],

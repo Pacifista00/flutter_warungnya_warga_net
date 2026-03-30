@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
+import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 import 'package:go_router/go_router.dart';
 
 class PaymentSuccessPage extends StatelessWidget {
@@ -25,7 +27,7 @@ class PaymentSuccessPage extends StatelessWidget {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: Colors.green,
+                color: AppColors.primary,
                 borderRadius: BorderRadius.circular(60),
               ),
               child: const Icon(Icons.check, color: Colors.white, size: 70),
@@ -53,22 +55,11 @@ class PaymentSuccessPage extends StatelessWidget {
             /// BUTTON LIHAT PESANAN
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: AppButton(
+                text: "Lihat Pesanan",
                 onPressed: () {
                   context.pushReplacement("/orders/detail/$orderId");
                 },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  "Lihat Pesanan",
-                  style: TextStyle(fontSize: 16),
-                ),
               ),
             ),
 
@@ -77,22 +68,13 @@ class PaymentSuccessPage extends StatelessWidget {
             /// BUTTON KEMBALI KE BERANDA
             SizedBox(
               width: double.infinity,
-              child: OutlinedButton(
+              child: AppButton(
+                text: "Kembali ke Beranda",
                 onPressed: () {
                   context.pushReplacement("/");
                 },
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: Colors.green),
-                  foregroundColor: Colors.green,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  "Kembali ke Beranda",
-                  style: TextStyle(fontSize: 16),
-                ),
+                backgroundColor: Colors.white,
+                textColor: AppColors.primary,
               ),
             ),
           ],

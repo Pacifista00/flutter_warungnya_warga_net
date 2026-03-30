@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:flutter_warungnya_warga_net/features/address/widgets/address_card.dart';
 import 'package:go_router/go_router.dart';
 import '../models/address_model.dart';
@@ -149,6 +150,8 @@ class _AddressListPageState extends State<AddressListPage> {
       ),
 
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white, // warna icon
         onPressed: () async {
           final result = await context.push('/addresses/create');
 

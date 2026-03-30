@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:flutter_warungnya_warga_net/features/cart/models/shipping_model.dart';
@@ -76,12 +77,10 @@ class _CartFooterState extends State<CartFooter> {
             SizedBox(
               height: 48,
               width: 140,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: disabled ? Colors.grey : AppColors.primary,
-                  foregroundColor: Colors.white,
-                ),
+              child: AppButton(
+                text: 'Checkout',
                 onPressed: disabled ? null : _handleCheckout,
+                backgroundColor: disabled ? Colors.grey : AppColors.primary,
                 child:
                     loading
                         ? const SizedBox(
@@ -92,7 +91,7 @@ class _CartFooterState extends State<CartFooter> {
                             color: Colors.white,
                           ),
                         )
-                        : const Text('Checkout'),
+                        : null,
               ),
             ),
           ],

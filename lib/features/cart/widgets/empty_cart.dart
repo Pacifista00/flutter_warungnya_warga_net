@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
+import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 
 class EmptyCartWidget extends StatelessWidget {
   const EmptyCartWidget({super.key});
@@ -36,16 +37,14 @@ class EmptyCartWidget extends StatelessWidget {
             const SizedBox(height: 24),
 
             SizedBox(
-              width: 200,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                ),
+              width: 200, // tetap bisa atur width di sini
+              child: AppButton(
+                text: "Mulai Belanja",
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Text("Mulai Belanja"),
+                height: 48,
+                borderRadius: 50,
               ),
             ),
           ],

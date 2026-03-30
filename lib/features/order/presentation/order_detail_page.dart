@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_warungnya_warga_net/features/cart/widgets/midtrans_payment_page.dart';
 import 'package:flutter_warungnya_warga_net/widgets/format_date_time.dart';
+import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 import 'package:flutter_warungnya_warga_net/widgets/order_status_helper.dart';
 import 'package:go_router/go_router.dart';
 import '../models/order_model.dart';
@@ -502,16 +503,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   SizedBox(
                     width: double.infinity,
                     height: 48,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                      ),
+                    child: AppButton(
+                      text:
+                          cancelLoading ? "Membatalkan..." : "Batalkan Pesanan",
                       onPressed:
                           cancelLoading ? null : () => _confirmCancel(order),
-                      child: Text(
-                        cancelLoading ? "Membatalkan..." : "Batalkan Pesanan",
-                      ),
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
                     ),
                   ),
                 ],
@@ -523,13 +521,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   SizedBox(
                     width: double.infinity,
                     height: 48,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                      ),
+                    child: AppButton(
+                      text: "Bayar Sekarang",
                       onPressed: () => _handlePayNow(order),
-                      child: const Text("Bayar Sekarang"),
                     ),
                   ),
                 ],

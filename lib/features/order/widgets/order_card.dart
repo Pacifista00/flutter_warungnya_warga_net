@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
 import 'package:flutter_warungnya_warga_net/features/order/models/order_model.dart';
+import 'package:flutter_warungnya_warga_net/widgets/forms/app_button.dart';
 import 'package:flutter_warungnya_warga_net/widgets/order_status_badge.dart';
 import 'package:go_router/go_router.dart';
 
@@ -135,19 +136,15 @@ class OrderCard extends StatelessWidget {
                 IntrinsicWidth(
                   child: SizedBox(
                     height: 36,
-                    child: ElevatedButton(
+                    child: AppButton(
+                      text: 'Lihat Detail',
                       onPressed: () {
                         context.push('/orders/detail/${order.id}');
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text('Lihat Detail'),
+                      height: 36,
+                      borderRadius: 50, // kapsul
+                      backgroundColor: AppColors.primary,
+                      textColor: Colors.white,
                     ),
                   ),
                 ),

@@ -237,25 +237,6 @@ class CaraBelanjaPage extends StatelessWidget {
           ),
 
           const SizedBox(height: 20),
-
-          /// BUTTON WA
-          Center(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-              ),
-              onPressed: _openWhatsApp,
-              child: const Text("Hubungi Kami"),
-            ),
-          ),
         ],
       ),
     );

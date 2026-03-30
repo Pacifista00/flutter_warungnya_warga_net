@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_warungnya_warga_net/config/env/prod_env.dart';
 import 'package:flutter_warungnya_warga_net/core/theme/app_colors.dart';
@@ -21,14 +22,51 @@ class _EditPhotoPageState extends ConsumerState<EditPhotoPage> {
 
   final ImagePicker _picker = ImagePicker();
 
+  Future<File?> compressImage(File file) async {
+    final String targetPath =
+        '${file.parent.path}/temp_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+    // result is an XFile?
+    final result = await FlutterImageCompress.compressAndGetFile(
+      file.path,
+      targetPath,
+      quality: 70,
+      minWidth: 800,
+      minHeight: 800,
+      format: CompressFormat.jpeg,
+    );
+
+    // Convert XFile? to File?
+    return result != null ? File(result.path) : null;
+  }
+
   Future<void> _pickImage() async {
     final XFile? pickedFile = await _picker.pickImage(
-      source: ImageSource.gallery, // bisa diganti camera
-      imageQuality: 80, // kompres sedikit agar tidak terlalu besar
+      source: ImageSource.gallery,
+      imageQuality: 80, // kompres awal
     );
 
     if (pickedFile != null) {
-      setState(() => _selectedImage = File(pickedFile.path));
+      File originalFile = File(pickedFile.path);
+
+      // compress
+      File? compressedFile = await compressImage(originalFile);
+      File finalFile = compressedFile ?? originalFile;
+
+      final sizeInMb = finalFile.lengthSync() / (1024 * 1024);
+      if (sizeInMb > 2) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("File terlalu besar. Maksimal 2 MB"),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+        return; // batalkan
+      }
+
+      setState(() => _selectedImage = finalFile);
     }
   }
 

@@ -14,9 +14,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController nameController;
-  late TextEditingController emailController;
   late TextEditingController phoneController;
 
+  String? gender; // male / female
   bool loading = false;
 
   @override
@@ -26,14 +26,13 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     final user = authState.user ?? {};
 
     nameController = TextEditingController(text: user['name'] ?? '');
-    emailController = TextEditingController(text: user['email'] ?? '');
     phoneController = TextEditingController(text: user['phone'] ?? '');
+    gender = user['gender']; // ambil gender dari user jika ada
   }
 
   @override
   void dispose() {
     nameController.dispose();
-    emailController.dispose();
     phoneController.dispose();
     super.dispose();
   }
@@ -41,16 +40,22 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   Future<void> submit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    if (gender == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Gender wajib dipilih")));
+      return;
+    }
+
     setState(() => loading = true);
 
     final data = {
       "name": nameController.text,
-      "email": emailController.text,
       "phone": phoneController.text,
+      "gender": gender,
     };
 
     try {
-      // update user via authProvider
       await ref.read(authProvider.notifier).updateProfile(data);
 
       if (mounted) {
@@ -60,8 +65,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             behavior: SnackBarBehavior.floating,
           ),
         );
-
-        context.pop(true); // kembali ke halaman sebelumnya
+        context.pop(true);
       }
     } catch (e) {
       if (mounted) {
@@ -101,6 +105,70 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     );
   }
 
+  Widget _buildGenderToggle() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        // Menggunakan Column agar label ada di atas (lebih rapi di mobile)
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Jenis Kelamin",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              _genderOption("Laki-laki", "male", Icons.male),
+              const SizedBox(width: 12),
+              _genderOption("Perempuan", "female", Icons.female),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _genderOption(String label, String value, IconData icon) {
+    final isSelected = gender == value;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => gender = value),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.blue.withOpacity(0.1) : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? Colors.blue : Colors.grey.shade300,
+              width: 2,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: isSelected ? Colors.blue : Colors.grey,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? Colors.blue : Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,17 +191,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 prefixIcon: Icons.person_outline,
               ),
               _buildTextField(
-                label: "Email",
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                prefixIcon: Icons.email_outlined,
-              ),
-              _buildTextField(
                 label: "No Telepon",
                 controller: phoneController,
                 keyboardType: TextInputType.phone,
                 prefixIcon: Icons.phone_android_outlined,
               ),
+              _buildGenderToggle(),
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
